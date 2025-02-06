@@ -1,0 +1,36 @@
+
+
+/* ✅ 페이지 콘텐츠 영역 */
+.content {
+  padding-top: 4rem; /* 헤더 높이 고려 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 4rem);
+}
+/* ✅ 메인 레이아웃 내부에서만 오버레이 활성화 */
+.main-layout {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* 🔹 메인 레이아웃 밖으로 벗어나는 스크롤 방지 */
+}
+
+/* ✅ 배경 어둡게 (모달이 열릴 때만) */
+.overlay {
+  position: absolute; /* 🔹 `fixed`에서 `absolute`로 변경하여 `MainLayout` 안에서만 적용 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+/* ✅ 패널이 열릴 때만 오버레이 활성화 */
+.overlay.open {
+  opacity: 1;
+  visibility: visible;
+}

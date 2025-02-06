@@ -1,0 +1,12 @@
+/* ✅ 헤더 스타일 */
+.header {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+/* ✅ 사람 아이콘 */
+.user-icon {
+  font-size: 1.8rem;
+  cursor: pointer;
+}
