@@ -26,7 +26,7 @@ const AppRoutes: React.FC = () => {
 
       <Route path="/signup" element={<Signup />} />
       <Route path="/signup/ad-consent" element={<AdConsentPage />} />
-      <Route path="/complete" element={<SignupCompletePage />} />
+      <Route path="/complete" element={<SignupCompletePage />} /> {/* ✅ 바로 사용 가능 */}
     </Routes>
   );
 };

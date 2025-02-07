@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/ad_consent.css";
+
+const API_URL = "http://localhost:8000/api/v1/members/"; // ✅ 백엔드 API URL
 
 const AdConsentPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const formData = location.state || {}; // ✅ 이전 페이지에서 전달된 데이터
+
+  // ✅ 이전 단계에서 저장한 회원가입 정보 불러오기
+  const storedFormData = JSON.parse(localStorage.getItem("signupData") || "{}");
 
   const [consents, setConsents] = useState([
     { id: 1, title: "광고성 문자 안내 1", agreed: false },
@@ -13,15 +17,29 @@ const AdConsentPage: React.FC = () => {
     { id: 3, title: "광고성 문자 안내 3", agreed: false },
   ]);
 
-  // ✅ 동의 상태 업데이트
   const handleConsentChange = (id: number, agreed: boolean) => {
-    setConsents(consents.map(item => (item.id === id ? { ...item, agreed } : item)));
+    setConsents(consents.map((item) => (item.id === id ? { ...item, agreed } : item)));
   };
 
-  // ✅ 가입 완료 페이지로 이동
-  const handleNext = () => {
-    const updatedFormData = { ...formData, adConsents: consents };
-    navigate("/complete", { state: updatedFormData });
+  const handleSubmit = async () => {
+    try {
+      // ✅ 광고 동의 여부 추가
+      const is_ad_agreed = consents.some((c) => c.agreed);
+
+      // ✅ 최종 회원가입 데이터 생성
+      const finalData = { ...storedFormData, is_ad_agreed };
+
+      console.log("📌 서버로 보낼 데이터:", finalData);
+
+      // ✅ 서버에 `POST` 요청
+      await axios.post(API_URL, finalData, { withCredentials: true });
+
+      // ✅ 성공 시 회원가입 완료 페이지로 이동
+      navigate("/complete");
+    } catch (error) {
+      console.error("⚠️ 회원가입 요청 실패:", error);
+      alert("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -48,7 +66,9 @@ const AdConsentPage: React.FC = () => {
         </div>
       ))}
 
-      <button className="next-button" onClick={handleNext}>저장 후 계속하기</button>
+      <button className="next-button" onClick={handleSubmit}>
+        회원가입 완료
+      </button>
     </div>
   );
 };
