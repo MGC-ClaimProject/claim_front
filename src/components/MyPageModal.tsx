@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { animated, useSpring } from "@react-spring/web";
-import { useAuthStore } from "../stores/useAuthStore.ts"; // ✅ Zustand import
+import { useAuthStore } from "../stores/useAuthStore.tsx"; // ✅ Zustand import
 
 interface MyPageModalProps {
   isOpen: boolean;
