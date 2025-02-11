@@ -9,7 +9,7 @@ import SignupCompletePage from "./pages/SignupCompletePage";
 const AuthRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/signup/ad-consent" element={<AdConsentPage />} />
       <Route path="/complete" element={<SignupCompletePage />} />

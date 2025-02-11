@@ -9,7 +9,7 @@ const AppWrapper: React.FC = () => {
   useEffect(() => {
     // ✅ 로그인 만료 시 `login`으로 이동하도록 설정
     setRedirectFunction(() => {
-      navigate("/");
+      navigate("/login");
     });
   }, [navigate]);
 

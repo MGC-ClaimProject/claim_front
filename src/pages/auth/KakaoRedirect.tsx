@@ -18,7 +18,7 @@ const KakaoAuth: React.FC = () => {
       requestAccessToken(code);
     } else {
       console.error("❌ 인가 코드가 없습니다.");
-      navigate("/");
+      navigate("/login");
     }
   }, []);
 
@@ -49,7 +49,7 @@ const KakaoAuth: React.FC = () => {
       }
     } catch (error) {
       console.error("❌ 카카오 로그인 요청 실패:", error.response?.data || error.message);
-      navigate("/");
+      navigate("/login");
     }
   };
 
