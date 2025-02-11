@@ -6,10 +6,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 4rem);
 }
 /* ✅ 메인 레이아웃 내부에서만 오버레이 활성화 */
 .main-layout {
+  display: flex;
+  align-content: center;
+  justify-content: center;
   position: relative;
   width: 100vw;
   height: 100vh;
