@@ -1,116 +1,125 @@
-import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-import { auth } from "../api/axiosInstance"; // ✅ 인증 요청을 위한 axios 인스턴스
-import "../styles/ProfileCard.css"; // ✅ 스타일 적용
+import React, { useState, useEffect } from "react";
+import { auth } from "../api/axiosInstance";
+import { Member, ProfileCardProps } from "../stores/useAuthStore"; // ✅ 인터페이스 임포트
+import "../styles/profileCard.css";
+import { RELATION_CHOICES, GENDER_CHOICES } from "../constants/choices.ts";
 
-interface ProfileCardProps {
-  memberId: number; // ✅ 멤버 ID
-  name: string;
-  phone: string;
-  birth: string;
-  gender: string;
-  onSave?: () => void; // ✅ 저장 후 실행할 콜백 함수
-}
-
-const ProfileCard: React.FC<ProfileCardProps> = ({ memberId, name, phone, birth, gender, onSave }) => {
-  // const navigate = useNavigate();
+const ProfileCard: React.FC<ProfileCardProps> = ({ member, onSave, hideRelation = false }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({ name, phone, birth, gender });
+  const [tempData, setTempData] = useState<Member>(member);
 
-  // ✅ 성별 변환 (영어 → 한글)
-  const genderKorean = formData.gender === "Male" ? "남성" : formData.gender === "Female" ? "여성" : "-";
+  useEffect(() => {
+    setTempData(member); // ✅ `member`가 변경될 때 업데이트
+  }, [member]);
 
-  // ✅ 입력값 변경 핸들러
+  function formatPhoneNumber(value: string) {
+    const cleaned = value.replace(/\D/g, "");
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 7) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7, 11)}`;
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setTempData((prev) => ({
       ...prev,
-      [name]: name === "isAdAgreed" ? value === "true" : value, // ✅ Boolean 변환 처리
+      [name]: name === "phone" ? formatPhoneNumber(value) : value,
     }));
   };
 
-  // ✅ 저장 버튼 클릭 시 API 요청 (PATCH)
   const handleSave = async () => {
     try {
-      await auth.patch(`/members/${memberId}/`, formData); // ✅ PATCH 요청
+      const requestData = { ...tempData, phone: tempData.phone.replace(/-/g, "") };
+      console.log("📤 저장 요청 데이터:", requestData);
+
+      await auth.patch(`/members/${member.id}/`, requestData);
+
+      // ✅ 저장 성공 시, UI 즉시 업데이트
+      setTempData(tempData);
       alert("정보가 성공적으로 저장되었습니다.");
       setIsEditing(false);
-      onSave?.(); // ✅ 저장 후 콜백 실행 (데이터 갱신)
+
+      // ✅ 최신 데이터 다시 불러오기
+      onSave?.();
     } catch (error) {
       console.error("❌ 정보 수정 실패:", error);
       alert("정보 수정에 실패했습니다.");
     }
   };
 
-  // ✅ 수정 모드 취소
   const handleCancel = () => {
-    setFormData({ name, phone, birth, gender });
+    setTempData(member);
     setIsEditing(false);
   };
 
   return (
     <div className="profile-card">
       <div className="profile-header">
-        <h2 className="profile-title">{formData.name || "고객"}님의 정보</h2>
-        {isEditing && (
-          <button className="cancel-btn" onClick={handleCancel}>
-            ❌
+        <h2 className="profile-title">{tempData.name || "고객"}님의 정보</h2>
+        {isEditing && <button className="cancel-btn" onClick={handleCancel}>❌</button>}
+      </div>
+
+      {!isEditing ? (
+        <>
+          <div className="profile-info"><label>📝 이름</label><span>{tempData.name || "-"}</span></div>
+          <div className="profile-info"><label>📞 연락처</label><span>{formatPhoneNumber(tempData.phone) || "-"}</span></div>
+          <div className="profile-info"><label>🎂 생년월일</label><span>{tempData.birth || "-"}</span></div>
+          <div className="profile-info"><label>🚻 성별</label>
+            <span>{GENDER_CHOICES[tempData.gender] || "-"}</span>
+          </div>
+          {!hideRelation && tempData.relation !== "Self" && (
+            <div className="profile-info">
+              <label>🔗 관계</label>
+              <span>{RELATION_CHOICES[tempData.relation] || "기타"}</span>
+            </div>
+          )}
+          <button className="profile-edit-btn" onClick={() => setIsEditing(true)}>
+            ✏️ 수정하기
           </button>
-        )}
-      </div>
-
-      {/* ✅ 이름 */}
-      <div className="profile-info">
-        <label>📝 이름</label>
-        {isEditing ? (
-          <input type="text" name="name" value={formData.name} onChange={handleChange} />
-        ) : (
-          <span>{formData.name || "-"}</span>
-        )}
-      </div>
-
-      {/* ✅ 연락처 */}
-      <div className="profile-info">
-        <label>📞 연락처</label>
-        {isEditing ? (
-          <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
-        ) : (
-          <span>{formData.phone || "-"}</span>
-        )}
-      </div>
-
-      {/* ✅ 생년월일 */}
-      <div className="profile-info">
-        <label>🎂 생년월일</label>
-        {isEditing ? (
-          <input type="date" name="birth" value={formData.birth} onChange={handleChange} />
-        ) : (
-          <span>{formData.birth || "-"}</span>
-        )}
-      </div>
-
-      {/* ✅ 성별 */}
-      <div className="profile-info">
-        <label>🚻 성별</label>
-        {isEditing ? (
-          <select name="gender" value={formData.gender} onChange={handleChange}>
-            <option value="Male">남성</option>
-            <option value="Female">여성</option>
-          </select>
-        ) : (
-          <span>{genderKorean}</span>
-        )}
-      </div>
-
-      {/* ✅ 저장 버튼 */}
-      {isEditing ? (
-        <button className="profile-edit-btn" onClick={handleSave}>
-          ✅ 저장하기
-        </button>
+        </>
       ) : (
-        <button className="profile-edit-btn" onClick={() => setIsEditing(true)}>
-          ✏️ 내 정보 수정하기
-        </button>
+        <>
+          <div className="profile-info">
+            <label>📝 이름</label>
+            <input type="text" name="name" value={tempData.name} onChange={handleChange} />
+          </div>
+
+          <div className="profile-info">
+            <label>📞 연락처</label>
+            <input type="text" name="phone" value={tempData.phone} onChange={handleChange} maxLength={13} />
+          </div>
+
+          <div className="profile-info">
+            <label>🎂 생년월일</label>
+            <input type="date" name="birth" value={tempData.birth} onChange={handleChange} />
+          </div>
+
+          <div className="profile-info">
+            <label>🚻 성별</label>
+            <select name="gender" value={tempData.gender} onChange={handleChange}>
+              {Object.entries(GENDER_CHOICES).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {!hideRelation && tempData.relation !== "Self" && (
+            <div className="profile-info">
+              <label>🔗 관계</label>
+              <select name="relation" value={tempData.relation} onChange={handleChange}>
+                {Object.entries(RELATION_CHOICES).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <button className="profile-edit-btn" onClick={handleSave}>✅ 저장하기</button>
+        </>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; // ✅ useLocation 추가
 import { animated, useSpring } from "@react-spring/web";
 import { useAuthStore } from "../stores/useAuthStore.tsx"; // ✅ Zustand import
 
@@ -12,6 +12,7 @@ const API_LOGOUT = "http://localhost:8000/api/v1/users/logout/";
 
 const MyPageModal: React.FC<MyPageModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ 현재 페이지 감지
   const clearAuth = useAuthStore((state) => state.clearAuth); // ✅ Zustand 상태 가져오기
 
   // ✅ Zustand에서 user 상태 가져오기
@@ -26,6 +27,13 @@ const MyPageModal: React.FC<MyPageModalProps> = ({ isOpen, onClose }) => {
     transform: isOpen ? "translateX(0%)" : "translateX(110%)",
     opacity: isOpen ? 1 : 0.8,
   });
+
+  // ✅ 페이지 이동 감지 → 모달 자동 닫기
+  useEffect(() => {
+    if (isOpen) {
+      onClose();
+    }
+  }, [location.pathname]); // 🔹 URL이 변경될 때 실행
 
   // ✅ 로그아웃 핸들러 (Zustand 적용)
   const handleLogout = async () => {

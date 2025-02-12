@@ -1,50 +1,78 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../api/axiosInstance"; // ✅ 인증 요청을 위한 axios 인스턴스
-import "../styles/FamilyList.css"; // ✅ 스타일 적용
+import { useDrag } from "@use-gesture/react"; // ✅ 스와이프 추가
+import { auth } from "../api/axiosInstance";
+import "../styles/familyList.css";
 import { Member } from "../stores/useAuthStore";
-import AddFamilyModal from "../components/AddFamilyModal"; // ✅ 가족 추가 모달 import
+import AddFamilyModal from "../components/AddFamilyModal";
+import { RELATION_CHOICES } from "../constants/choices.ts";
 
 const FamilyListPage: React.FC = () => {
   const navigate = useNavigate();
-  const [members, setMembers] = useState<Member[]>([]); // ✅ 가족 목록 상태
-  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ 모달 상태
+  const [members, setMembers] = useState<Member[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState(0);
 
-  // ✅ 가족 목록 가져오기
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await auth.get("/members/"); // ✅ API 요청
-        const filteredMembers = response.data.filter((member: Member) => member.id !== 1); // ✅ 1번 멤버 제외
+        const response = await auth.get("/members/");
+        const members: Member[] = response.data;
+
+        // ✅ 본인(Self)을 제외한 멤버만 필터링
+        const filteredMembers = members.filter((member) => member.relation !== "Self");
         setMembers(filteredMembers);
       } catch (error) {
         console.error("❌ 가족 목록 가져오기 실패:", error);
       }
     };
+
     fetchMembers();
   }, []);
 
+  // ✅ 스와이프 감지 (가족 목록 스크롤)
+  const bind = useDrag(({ movement: [, my], last }) => {
+    if (listRef.current) {
+      const containerHeight = listRef.current.clientHeight; // 현재 화면 높이
+      const contentHeight = listRef.current.scrollHeight; // 컨텐츠 전체 높이
+
+      setOffset((prev) => {
+        let newOffset = prev + my;
+
+        // ✅ 위아래 이동 범위 제한
+        newOffset = Math.max(-(contentHeight - containerHeight), Math.min(0, newOffset));
+
+        return newOffset;
+      });
+
+      if (last) {
+        listRef.current.style.transform = `translateY(${offset}px)`;
+      }
+    }
+  });
+
   return (
     <div className="family-container">
-      {/* ✅ 타이틀과 '가족 추가하기' 버튼 */}
       <div className="family-header">
         <h2 className="family-title">👨‍👩‍👧 나의 가족</h2>
         <button className="add-family-btn" onClick={() => setIsModalOpen(true)}>
-          가족 추가하기 ➕
+          <p>➕</p>
         </button>
       </div>
 
-      {/* ✅ 가족 목록 */}
-      <div className="family-list">
+      <div className="family-list" ref={listRef} {...bind()} style={{ transform: `translateY(${offset}px)`, transition: "transform 0.2s ease-out" }}>
         {members.length > 0 ? (
           members.map((member) => (
             <div
               key={member.id}
               className="family-card"
-              onClick={() => navigate(`/main/family/${member.id}`)} // ✅ 특정 멤버 페이지로 이동
+              onClick={() => navigate(`/main/family/${member.id}`)}
             >
               <p className="family-name">{member.name} 님</p>
-              <p className="family-relation">관계: {member.relation}</p>
+              <p className="family-relation">
+                관계: {RELATION_CHOICES[member.relation] || "기타"}
+              </p>
               <p className="family-gender">성별: {member.gender === "Male" ? "남성" : "여성"}</p>
               <p className="family-birth">🎂 {member.birth}</p>
             </div>
@@ -54,7 +82,6 @@ const FamilyListPage: React.FC = () => {
         )}
       </div>
 
-      {/* ✅ 가족 추가 모달 */}
       {isModalOpen && <AddFamilyModal onClose={() => setIsModalOpen(false)} />}
     </div>
   );

@@ -31,17 +31,19 @@ const LoginPage: React.FC = () => {
       // ✅ 로그인 전 요청 → `client` 사용
       const response = await client.post(KAKAO_REDIRECT_URI, { code });
 
-      if (response.data.access_token) {
-        console.log("✅ 백엔드 로그인 성공", response.data);
+      console.log("✅ 백엔드 응답 상태 코드:", response.status);
+
+      if (response.status === 201 && response.data.access_token) {
+        console.log("✅ 신규 회원 - 회원가입 페이지로 이동");
+        setAuth(response.data.access_token, response.data.user);
+        navigate("/signup");
+      } else if (response.status === 200 && response.data.access_token) {
+        console.log("✅ 기존 회원 - 로그인 성공");
         setAuth(response.data.access_token, response.data.user);
         navigate("/main");
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("❌ 카카오 로그인 요청 실패:", error.message);
-      } else {
-        console.error("❌ 알 수 없는 오류 발생");
-      }
+    } catch (error: any) {
+      console.error("❌ 카카오 로그인 요청 실패:", error.response?.data || error.message);
       navigate("/login");
     } finally {
       setLoading(false);

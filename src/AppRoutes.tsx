@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import MainLayout from "./layouts/MainLayout";
+import GlobalLayout from "./layouts/GlobalLayout.tsx";
 import MainPage from "./pages/MainPage";
 import InsurancePage from "./pages/InsurancePage";
 import ClaimPage from "./pages/ClaimPage";
@@ -17,7 +17,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/*" element={<AuthRoutes />} />
 
       {/* ✅ 메인 앱 라우트 */}
-      <Route path="/main" element={<MainLayout />}>
+      <Route path="/main" element={<GlobalLayout />}>
         <Route index element={<MainPage />} />
         <Route path="insurance" element={<InsurancePage />} />
         <Route path="claim" element={<ClaimPage />} />

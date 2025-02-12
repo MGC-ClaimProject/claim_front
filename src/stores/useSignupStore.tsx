@@ -4,9 +4,10 @@ interface SignupData {
   relation: string;
   name: string;
   phone: string;
-  birthDate: string;
+  birth: string;
   gender: string;
   adConsents: { id: number; title: string; agreed: boolean }[];
+  memberId?: number;
 }
 
 interface SignupStore {
@@ -20,7 +21,7 @@ export const useSignupStore = create<SignupStore>((set) => ({
     relation: "",
     name: "",
     phone: "",
-    birthDate: "",
+    birth: "",
     gender: "",
     adConsents: [],
   },
@@ -33,7 +34,7 @@ export const useSignupStore = create<SignupStore>((set) => ({
         relation: "",
         name: "",
         phone: "",
-        birthDate: "",
+        birth: "",
         gender: "",
         adConsents: [],
       },

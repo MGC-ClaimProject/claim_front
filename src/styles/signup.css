@@ -1,76 +1,38 @@
+/* ✅ 회원가입 컨테이너 */
 .signup-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* ✅ 최소 높이 설정 */
+  min-height: 100vh;
   width: 100vw;
   background: #f8f9fa;
-  padding-bottom: 30px; /* ✅ 하단 간격 확보 */
+  padding-bottom: 30px;
 }
 
-/* ✅ 회원가입 제목 스타일 수정 */
+/* ✅ 회원가입 제목 */
 .signup-title {
   font-size: 1.5rem;
   font-weight: bold;
-  color: black; /* ✅ 글씨 색상을 명확하게 */
-  margin-bottom: 1rem; /* ✅ 입력 필드와의 간격 확보 */
-  text-align: center;
-}
-
-/* 회원가입 박스 */
-.signup-box {
-  box-sizing: border-box;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  width: 90%;
-  max-width: 350px;
-  text-align: center;
-  margin-bottom: 1rem; /* ✅ 동의 박스와의 간격 조정 */
-}
-
-/* 입력 필드 */
-.input-field {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 350px;
-  padding: 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  text-align: center;
-  background: white;
   color: black;
-}
-
-/* 플레이스홀더 스타일 */
-.input-field::placeholder {
-  color: #999;
-  font-size: 0.9rem;
-}
-
-/* 드롭다운 스타일 */
-select.input-field {
-  cursor: pointer;
-}
-
-/* ✅ 하단 고정이 아닌 회원가입 박스 아래 위치 */
-.agreement-box {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 350px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
+  margin-bottom: 1rem;
   text-align: center;
-  margin-bottom: 1rem; /* ✅ 페이지 하단과의 간격 */
 }
 
-/* ✅ 동의 체크박스 */
+/* ✅ 프로필 & 동의 박스 크기 조정 */
+.profile-card,
+.agreement-box {
+  width: 90%; /* 기본적으로 화면 크기에 맞춤 */
+  max-width: 350px; /* 최대 350px로 고정 */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* ✅ 동의 박스 내 컨텐츠 스타일 */
 .agreement-title {
   font-size: 1rem;
   font-weight: bold;
@@ -95,7 +57,7 @@ select.input-field {
 
 /* ✅ 동의 버튼 */
 .agree-button {
-  width: 100%;
+  width: 90%;
   max-width: 350px;
   padding: 0.8rem;
   background: #6200ea;

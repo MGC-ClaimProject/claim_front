@@ -19,25 +19,37 @@
   margin-bottom: 1rem;
 }
 
-.profile-title{
-    display: block;
-}
-
-/* ✅ 취소 버튼 */
+/* ✅ 취소 (X) 버튼 - 투명한 배경 적용 */
 .cancel-btn {
-
-  background: transparent;
+  background: transparent; /* ✅ 배경 투명 처리 */
   border: none;
   font-size: 1.5rem;
   color: #ff5252;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
-    padding: 0 1rem;
-    margin-bottom: 1rem;
+  margin-left: auto; /* ✅ 제목 오른쪽 끝으로 정렬 */
 }
 
 .cancel-btn:hover {
   transform: scale(1.2);
+}
+
+
+.profile-title{
+    display: block;
+}
+.profile-save-btn {
+  background: transparent;
+  border: 2px solid #ff4081;
+  color: #ff4081;
+  padding: 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 /* ✅ 프로필 정보 */
@@ -46,11 +58,9 @@
   justify-content: space-between;
   align-items: center;
   font-size: 1rem;
-  color: #4caf50;
   font-weight: bold;
   margin-bottom: 1rem;
   padding-bottom: 5px;
-  border-bottom: 1px solid #81c784;
 }
 
 .profile-info label {
@@ -70,27 +80,6 @@
 .profile-info input,
 .profile-info select {
   width: 60%;
-
-  border: 1px solid #81c784;
   border-radius: 5px;
   font-size: .9rem;
-}
-
-/* ✅ 수정/저장 버튼 */
-.profile-edit-btn {
-  background: #4caf50;
-  border: none;
-  color: white;
-  padding: 0.8rem;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 1rem;
-  font-weight: bold;
-  margin-top: 1rem;
-  transition: background 0.2s ease-in-out;
-}
-
-.profile-edit-btn:hover {
-  background: #388e3c;
 }
