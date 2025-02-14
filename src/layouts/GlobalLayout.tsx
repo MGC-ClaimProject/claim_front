@@ -1,11 +1,11 @@
 // src/layouts/GlobalLayout.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import MyPageModal from "../components/MyPageModal";
+import MyPageModal from "../components/modals/MyPageModal.tsx";
 import NavBar from "../components/Navbar";
 import Header from "../components/Header";
 import { useSwipe } from "../hooks/useSwipe"; // ✅ 스와이프 훅 불러오기
-import "../styles/main.css";
+import "../styles/pages/main.css";
 
 const GlobalLayout: React.FC = () => {
   const [isMyPageOpen, setIsMyPageOpen] = useState(false);

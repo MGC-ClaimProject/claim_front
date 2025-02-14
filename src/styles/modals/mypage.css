@@ -1,6 +1,6 @@
 /* ✅ 마이페이지 패널 */
 .mypage-panel {
-  position: absolute;
+  position: fixed;
   top: 3.5rem;
   right: 1rem;
   width: 230px;
@@ -17,7 +17,6 @@
 /* ✅ 패널이 열릴 때 */
 .mypage-panel.open {
   opacity: 1;
-
 }
 
 /* ✅ 마이페이지 제목 */
@@ -82,4 +81,23 @@
 /* ✅ X 버튼 마우스 오버 효과 */
 .close-button:hover {
   color: red; /* ✅ 마우스를 올리면 빨간색 */
+}
+
+/* ✅ 오버레이 스타일 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.overlay.open {
+  opacity: 1;
+  visibility: visible;
 }

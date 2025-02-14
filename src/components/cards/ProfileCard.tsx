@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { auth } from "../api/axiosInstance";
-import { Member, ProfileCardProps } from "../stores/useAuthStore"; // ✅ 인터페이스 임포트
-import "../styles/profileCard.css";
-import { RELATION_CHOICES, GENDER_CHOICES } from "../constants/choices.ts";
+import { auth } from "../../api/axiosInstance.tsx";
+import { Member, ProfileCardProps, useAuthStore } from "../../stores/useAuthStore.tsx";
+import "../../styles/cards/profileCard.css";
+import { RELATION_CHOICES, GENDER_CHOICES } from "../../constants/choices.ts";
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ member, onSave, hideRelation = false }) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({ member, setFormData, onSave, hideRelation = false }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempData, setTempData] = useState<Member>(member);
+  const fetchMember = useAuthStore((state) => state.fetchMember); // ✅ Zustand에서 fetchMember 가져오기
 
+  // ✅ `member` 변경될 때마다 `tempData` 업데이트
   useEffect(() => {
-    setTempData(member); // ✅ `member`가 변경될 때 업데이트
+    setTempData(member);
   }, [member]);
 
+  // ✅ 전화번호 포맷 적용
   function formatPhoneNumber(value: string) {
     const cleaned = value.replace(/\D/g, "");
     if (cleaned.length <= 3) return cleaned;
@@ -19,6 +22,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ member, onSave, hideRelation 
     return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7, 11)}`;
   }
 
+  // ✅ 입력 변경 감지
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setTempData((prev) => ({
@@ -27,26 +31,35 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ member, onSave, hideRelation 
     }));
   };
 
+  // ✅ 수정된 데이터 저장
   const handleSave = async () => {
     try {
       const requestData = { ...tempData, phone: tempData.phone.replace(/-/g, "") };
       console.log("📤 저장 요청 데이터:", requestData);
 
-      await auth.patch(`/members/${member.id}/`, requestData);
+      // ✅ 서버 업데이트 요청
+      const response = await auth.patch(`/members/${member.id}/`, requestData);
+      const updatedMember = response.data;
 
-      // ✅ 저장 성공 시, UI 즉시 업데이트
-      setTempData(tempData);
+      // ✅ Zustand 및 `setFormData`를 통해 상태 업데이트
+      if (setFormData) {
+        setFormData(updatedMember);
+      }
+
+      await fetchMember(updatedMember.id); // ✅ 최신 데이터 반영
+
+      // ✅ UI 업데이트
+      setTempData(updatedMember);
       alert("정보가 성공적으로 저장되었습니다.");
       setIsEditing(false);
-
-      // ✅ 최신 데이터 다시 불러오기
-      onSave?.();
+      onSave?.(); // ✅ 추가적인 데이터 갱신 요청
     } catch (error) {
       console.error("❌ 정보 수정 실패:", error);
       alert("정보 수정에 실패했습니다.");
     }
   };
 
+  // ✅ 수정 취소
   const handleCancel = () => {
     setTempData(member);
     setIsEditing(false);

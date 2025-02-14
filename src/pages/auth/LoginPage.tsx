@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { client } from "../../api/axiosInstance.tsx"; // ✅ 로그인 전 요청용
 import { useAuthStore } from "../../stores/useAuthStore.tsx";
-import "../../styles/login.css";
+import "../../styles/auth/login.css";
 import Logo from "../../components/Logo.tsx";
 import kakaoIcon from "../../assets/kakao_icon.png";
 

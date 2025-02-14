@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // ✅ useLocation 추가
 import { auth } from "../api/axiosInstance";
-import "../styles/ad_consent.css";
+import "../styles/auth/ad_consent.css"; // ✅ 기존 스타일 유지
 
-const API_URL = "http://localhost:8000/api/v1/members/"; // ✅ 백엔드 API URL
+const API_URL = import.meta.env.VITE_BACKEND_BASE_URL + "/members/";
 
 const AdConsentPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ Signup에서 전달된 `state` 가져오기
+  const memberId = location.state?.memberId; // ✅ 전달된 memberId 가져오기
 
-  // ✅ 이전 단계에서 저장한 회원가입 정보 불러오기
-  const storedFormData = JSON.parse(localStorage.getItem("signupData") || "{}");
-
+  // ✅ 광고 동의 선택 상태
   const [consents, setConsents] = useState([
     { id: 1, title: "광고성 문자 안내 1", agreed: false },
     { id: 2, title: "광고성 문자 안내 2", agreed: false },
@@ -23,34 +23,22 @@ const AdConsentPage: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      // ✅ 광고 동의 여부 확인
-      const is_ad_agreed = consents.some((c) => c.agreed);
-
-      // ✅ 멤버 ID 확인 (저장된 데이터에서 가져오기)
-      const memberId = storedFormData.memberId;
-
       if (!memberId) {
         alert("회원 정보를 찾을 수 없습니다. 다시 시도해주세요.");
         return;
       }
 
-      // ✅ `PATCH` 요청으로 `is_ad_agreed` 정보만 업데이트
-      console.log(`📌 서버에 PATCH 요청: /members/${memberId}/`);
-      const response = await auth.patch(
-        `${API_URL}${memberId}/`,
-        { is_ad_agreed },
-        { withCredentials: true }
-      );
+      // ✅ 광고 동의 여부 확인
+      const is_ad_agreed = consents.some((c) => c.agreed);
 
-      // ✅ 200 응답 시 회원가입 완료 페이지로 이동
-      if (response.status === 200) {
-        navigate("/complete");
-      } else {
-        throw new Error("회원가입 수정 실패");
-      }
+      // ✅ 광고 동의 업데이트 요청
+      await auth.patch(`${API_URL}${memberId}/`, { is_ad_agreed });
+
+      // ✅ 가입 완료 페이지로 이동
+      navigate("/complete");
     } catch (error) {
-      console.error("⚠️ 회원가입 수정 실패:", error);
-      alert("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+      console.error("⚠️ 광고 동의 업데이트 실패:", error);
+      alert("오류가 발생했습니다. 다시 시도해주세요.");
     }
   };
 

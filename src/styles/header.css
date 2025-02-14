@@ -1,12 +1,12 @@
 /* ✅ 헤더 스타일 */
 .header {
+  width: 100%;
   box-sizing: border-box;
   height: 7vh;
   background: black;
   color: white;
   display: flex;
   align-items: center;
-  padding: 0 16px;
   justify-content: space-between;
 }
 

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { auth } from "../api/axiosInstance";
-import ProfileCard from "../components/ProfileCard"; // ✅ ProfileCard 임포트
-import "../styles/familyDetail.css";
+import ProfileCard from "../components/cards/ProfileCard.tsx";
+import InsuranceButton from "../components/buttons/InsuranceButton.tsx"; // ✅ 보험 리스트로 이동하는 버튼 추가
+import "../styles/pages/familyDetail.css";
 
 interface MemberDetail {
   id: number;
@@ -44,8 +45,12 @@ const FamilyDetailPage: React.FC = () => {
   return (
     <div className="family-detail-container">
       <h2>👤 {member.name}님의 상세 정보</h2>
-      {/* ✅ `member` 객체 전체를 전달해야 함 */}
       <ProfileCard member={member} />
+
+      {/* ✅ 가족 멤버의 보험 리스트 보러가기 버튼 */}
+      <div className="family-insurance-btn">
+        <InsuranceButton memberId={member.id} memberName={member.name} />
+      </div>
     </div>
   );
 };

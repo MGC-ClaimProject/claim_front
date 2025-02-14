@@ -1,18 +1,15 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDrag } from "@use-gesture/react"; // ✅ 스와이프 추가
 import { auth } from "../api/axiosInstance";
-import "../styles/familyList.css";
+import "../styles/pages/familyList.css";
 import { Member } from "../stores/useAuthStore";
-import AddFamilyModal from "../components/AddFamilyModal";
+import AddFamilyModal from "../components/modals/AddFamilyModal.tsx";
 import { RELATION_CHOICES } from "../constants/choices.ts";
 
 const FamilyListPage: React.FC = () => {
   const navigate = useNavigate();
   const [members, setMembers] = useState<Member[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const listRef = useRef<HTMLDivElement>(null);
-  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -31,27 +28,6 @@ const FamilyListPage: React.FC = () => {
     fetchMembers();
   }, []);
 
-  // ✅ 스와이프 감지 (가족 목록 스크롤)
-  const bind = useDrag(({ movement: [, my], last }) => {
-    if (listRef.current) {
-      const containerHeight = listRef.current.clientHeight; // 현재 화면 높이
-      const contentHeight = listRef.current.scrollHeight; // 컨텐츠 전체 높이
-
-      setOffset((prev) => {
-        let newOffset = prev + my;
-
-        // ✅ 위아래 이동 범위 제한
-        newOffset = Math.max(-(contentHeight - containerHeight), Math.min(0, newOffset));
-
-        return newOffset;
-      });
-
-      if (last) {
-        listRef.current.style.transform = `translateY(${offset}px)`;
-      }
-    }
-  });
-
   return (
     <div className="family-container">
       <div className="family-header">
@@ -61,7 +37,7 @@ const FamilyListPage: React.FC = () => {
         </button>
       </div>
 
-      <div className="family-list" ref={listRef} {...bind()} style={{ transform: `translateY(${offset}px)`, transition: "transform 0.2s ease-out" }}>
+      <div className="family-list">
         {members.length > 0 ? (
           members.map((member) => (
             <div

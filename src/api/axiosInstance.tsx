@@ -40,17 +40,20 @@ auth.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+
 // ✅ 액세스 토큰 자동 갱신 함수
 const refreshAccessToken = async () => {
   try {
-    const response = await client.post("/users/token/refresh/");
+    const response = await client.post("/users/token/refresh/", {}, { withCredentials: true });
     const newAccessToken = response.data.access_token;
     useAuthStore.getState().setAuth(newAccessToken, useAuthStore.getState().user!);
     return newAccessToken;
-  } catch {
+  } catch (error) {
+    console.error("❌ 액세스 토큰 갱신 실패:", error);
     redirectToLoginPage();
   }
 };
+
 
 // ✅ 401 발생 시 자동으로 액세스 토큰 갱신 또는 로그인 페이지 이동
 auth.interceptors.response.use(
