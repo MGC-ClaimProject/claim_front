@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { auth } from "../api/axiosInstance";
-import "../styles/addFamilyModal.css"; // ✅ 모달 스타일 적용
-import { RELATION_CHOICES, GENDER_CHOICES } from "../constants/choices"; // ✅ 관계 및 성별 선택지 추가
+import { auth } from "../../api/axiosInstance.tsx";
+import "../../styles/modals/addFamilyModal.css"; // ✅ 모달 스타일 적용
+import { RELATION_CHOICES, GENDER_CHOICES } from "../../constants/choices.ts"; // ✅ 관계 및 성별 선택지 추가
 
 interface AddFamilyModalProps {
   onClose: () => void; // ✅ 모달 닫기 함수

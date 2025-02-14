@@ -1,9 +1,9 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/auth/LoginPage.tsx";
-import Signup from "./pages/Signup";
+import Signup from "./pages/auth/Signup.tsx";
 import AdConsentPage from "./pages/AdConsentPage";
-import SignupCompletePage from "./pages/SignupCompletePage";
+import SignupCompletePage from "./pages/auth/SignupCompletePage.tsx";
 
 
 const AuthRoutes: React.FC = () => {

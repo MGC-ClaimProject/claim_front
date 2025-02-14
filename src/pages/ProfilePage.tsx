@@ -1,37 +1,31 @@
 import React, { useEffect } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
-import ProfileCard from "../components/ProfileCard"; // ✅ 공통 컴포넌트 추가
-import "../styles/profilePage.css";
+import ProfileCard from "../components/cards/ProfileCard.tsx";
+import InsuranceButton from "../components/buttons/InsuranceButton.tsx";
+import ClaimsButton from "../components/buttons/ClaimsButton.tsx";
+import FamilyButton from "../components/buttons/FamilyButton.tsx";
+import "../styles/pages/profilePage.css";
 
 const ProfilePage: React.FC = () => {
   const { member, fetchSelfMember, fetchMember } = useAuthStore();
 
   useEffect(() => {
-    fetchSelfMember(); // ✅ 본인(Self) 멤버 정보 자동 로드
+    fetchSelfMember();
   }, []);
 
   return (
     <div className="profile-container">
       {member ? (
-        <ProfileCard
-          member={member} // ✅ member 객체 전체를 전달
-          onSave={() => fetchMember(member.id)} // ✅ 저장 후 최신 데이터 불러오기
-        />
+        <ProfileCard member={member} onSave={() => fetchMember(member.id)} />
       ) : (
         <p>🔄 멤버 정보를 불러오는 중...</p>
       )}
 
-      {/* ✅ 이동 버튼 */}
+      {/* ✅ 이동 버튼 모음 */}
       <div className="profile-links">
-        <button className="insurance-btn" onClick={() => window.location.href = "/main/insurance"}>
-          📋 보험 리스트 보러가기
-        </button>
-        <button className="claims-btn" onClick={() => window.location.href = "/main/claims"}>
-          📝 청구 내역 보러가기
-        </button>
-        <button className="family-btn" onClick={() => window.location.href = "/main/family"}>
-          👨‍👩‍👧 가족 리스트 보러가기
-        </button>
+        <InsuranceButton /> {/* 내 보험 리스트로 이동 (memberId 없음) */}
+        <ClaimsButton />
+        <FamilyButton />
       </div>
     </div>
   );

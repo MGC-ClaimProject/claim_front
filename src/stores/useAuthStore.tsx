@@ -55,9 +55,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ accessToken: null, user: null, member: null });
   },
 
-  fetchUser: async () => {
+ fetchUser: async () => {
     try {
-      const response = await auth.get("/user/3/");
+      const response = await auth.get("/user/me/"); // ✅ 현재 로그인한 사용자 정보 가져오기
       const userData = response.data;
       localStorage.setItem("user", JSON.stringify(userData));
       set({ user: userData });
@@ -65,6 +65,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       console.error("❌ 사용자 정보 가져오기 실패:", error);
     }
   },
+
+
+
+
 
   fetchMember: async (memberId: number) => {
     try {
@@ -98,3 +102,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 }));
+
+
+

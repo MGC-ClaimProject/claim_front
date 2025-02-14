@@ -1,0 +1,65 @@
+/* ✅ 보험 상세 페이지 컨테이너 */
+.insurance-detail-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: transparent;
+}
+
+/* ✅ 보험 상세 정보 박스 */
+.insurance-detail-box {
+  background: #ddd;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ 제목 스타일 */
+.insurance-detail-box h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+  color: black;
+}
+
+/* ✅ 상세 정보 스타일 */
+.insurance-detail-box p {
+  font-size: 1.2rem;
+  color: black;
+  margin: 10px 0;
+}
+
+/* ✅ 강조 텍스트 */
+.insurance-detail-box strong {
+  font-weight: bold;
+  color: black;
+}
+
+/* ✅ 반응형 - 모바일 최적화 */
+@media (max-width: 600px) {
+  .insurance-detail-container {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .insurance-detail-box {
+    padding: 15px;
+  }
+
+  .insurance-detail-box h2 {
+    font-size: 1.5rem;
+  }
+
+  .insurance-detail-box p {
+    font-size: 1rem;
+  }
+}
+
+.insurance-detail-container {
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+}
+

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSignupStore } from "../stores/useSignupStore";
-import { Member, useAuthStore } from "../stores/useAuthStore";
-import ProfileCard from "../components/ProfileCard";
-import { auth } from "../api/axiosInstance";
-import "../styles/signup.css";
+import { useSignupStore } from "../../stores/useSignupStore.tsx";
+import { Member, useAuthStore } from "../../stores/useAuthStore.tsx";
+import ProfileCard from "../../components/cards/ProfileCard.tsx";
+import { auth } from "../../api/axiosInstance.tsx";
+import "../../styles/auth/signup.css";
+
+import { format } from "date-fns"; // ✅ 날짜 포맷 변환을 위해 import
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
   const { formData, setFormData } = useSignupStore();
   const { user } = useAuthStore();
+
+  // ✅ 현재 날짜 가져오기
+  const today = format(new Date(), "yyyy-MM-dd");
 
   // ✅ 필수 동의 체크박스 상태
   const [agreements, setAgreements] = useState({
@@ -36,12 +41,19 @@ const Signup: React.FC = () => {
 
         console.log(`✅ 첫 번째 멤버 ID: ${firstMember.id}`);
 
-        // ✅ 가져온 멤버 정보를 formData에 설정하여 수정 가능하게 함
+        // ✅ 가져온 생년월일이 오늘 날짜라면 빈 문자열로 변환
+        const birthValue = firstMember.birth === today ? "" : firstMember.birth;
+
+        // ✅ 성별이 "Male", "Female"이 아니면 빈칸 처리
+        const validGenders = ["Male", "Female"];
+        const genderValue = validGenders.includes(firstMember.gender) ? firstMember.gender : "";
+
+        // ✅ 최신 멤버 정보를 상태에 반영
         setFormData({
           name: firstMember.name,
           phone: firstMember.phone,
-          birth: firstMember.birth,
-          gender: firstMember.gender,
+          birth: birthValue,
+          gender: genderValue,
           relation: "Self",
           memberId: firstMember.id,
         });
@@ -54,31 +66,31 @@ const Signup: React.FC = () => {
   }, []);
 
   const handleAgreeAndContinue = () => {
-    // ✅ 필수 동의 체크박스를 모두 체크
-    setAgreements({
-      personalInfo: true,
-      sensitiveInfo: true,
-      profilingInfo: true,
-    });
+    // ✅ 최신 상태를 가져옴
+    const latestFormData = { ...formData };
 
-    // ✅ 모든 정보가 입력되었는지 확인
-    if (!formData.name || !formData.phone || !formData.birth || !formData.gender) {
+    console.log("📋 최신 formData 값:", latestFormData);
+
+    // ✅ 필수 입력값 검증
+    if (!latestFormData.name || !latestFormData.phone || !latestFormData.birth || !latestFormData.gender) {
       alert("모든 정보를 입력해주세요.");
       return;
     }
 
-    // ✅ 회원가입 데이터 구성
-    const signupData = {
-      ...formData,
+    // ✅ 최신 업데이트된 formData로 회원가입 데이터 구성
+    const updatedSignupData = {
+      ...latestFormData,
       user: user?.id || null,
       relation: "Self",
     };
 
-    // ✅ 회원가입 데이터를 로컬 스토리지에 저장
-    localStorage.setItem("signupData", JSON.stringify(signupData));
+    console.log("✅ 저장할 최신 데이터:", updatedSignupData);
 
-    // ✅ 선택 동의 화면으로 이동
-    navigate("/signup/ad-consent");
+    // ✅ 최신 데이터를 Zustand에도 반영
+    setFormData(updatedSignupData);
+
+    // ✅ 최신 memberId를 `state`로 넘겨서 광고 동의 페이지로 이동
+    navigate("/signup/ad-consent", { state: { memberId: updatedSignupData.memberId } });
   };
 
   return (

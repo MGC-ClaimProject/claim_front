@@ -2,7 +2,8 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import GlobalLayout from "./layouts/GlobalLayout.tsx";
 import MainPage from "./pages/MainPage";
-import InsurancePage from "./pages/InsurancePage";
+import InsurancePage from "./pages/InsuranceListPage";
+// import InsuranceDetailPage from "./pages/InsuranceDetailPage";
 import ClaimPage from "./pages/ClaimPage";
 import ProfilePage from "./pages/ProfilePage"; // ✅ 추가: 내 정보 페이지
 // import ClaimsPage from "./pages/ClaimsPage"; // ✅ 추가: 청구 내역 페이지
@@ -20,6 +21,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/main" element={<GlobalLayout />}>
         <Route index element={<MainPage />} />
         <Route path="insurance" element={<InsurancePage />} />
+        <Route path=":memberId/insurance" element={<InsurancePage />} />
         <Route path="claim" element={<ClaimPage />} />
 
         {/* ✅ 추가된 경로들 */}
