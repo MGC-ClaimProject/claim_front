@@ -1,44 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { auth } from "../api/axiosInstance.tsx";
-import AddInsuranceModal from "../components/modals/AddInsuranceModal.tsx"; // ✅ 모달 컴포넌트 추가
-import "../styles/pages/insuranceList.css";
-
-interface Insurance {
-  id: number;
-  company: string;
-  policy_name: string;
-  premium: number;
-}
+import useFetchInsurances from "../../hooks/useFetchInsurances.ts"; // ✅ Custom Hook 적용
+import AddInsuranceModal from "../../components/modals/AddInsuranceModal.tsx"; // ✅ 모달 컴포넌트 추가
+import "../../styles/pages/insuranceList.css";
 
 const InsuranceListPage: React.FC = () => {
   const { memberId } = useParams<{ memberId?: string }>();
   const location = useLocation();
-
-  const [insurances, setInsurances] = useState<Insurance[]>([]);
-  const [loading, setLoading] = useState(true);
+  const memberName = location.state?.memberName || "나";
   const [isModalOpen, setIsModalOpen] = useState(false); // ✅ 모달 상태 추가
 
-  const memberName = location.state?.memberName || "나";
-
-  useEffect(() => {
-    fetchInsurances();
-  }, [memberId]);
-
-  const fetchInsurances = async () => {
-    try {
-      const url = memberId ? `/insurances/${memberId}/` : "/insurances/";
-      const response = await auth.get(url);
-      setInsurances(response.data);
-    } catch (error) {
-      console.error("❌ 보험 정보를 가져오는 중 오류 발생:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ✅ 보험료 총합 계산
-  const totalPremium = insurances.reduce((sum, insurance) => sum + (insurance.premium || 0), 0);
+  // ✅ Custom Hook 사용
+  const { insurances, loading, totalPremium, fetchInsurances } = useFetchInsurances(memberId);
 
   return (
     <div className="insurance-container">

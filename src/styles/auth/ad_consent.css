@@ -64,7 +64,7 @@
 }
 
 /* ✅ 저장 후 계속하기 버튼 */
-.next-button {
+.ad-consent-container .next-button {
   width: 90%;
   max-width: 350px;
   padding: 1rem;
@@ -77,6 +77,6 @@
   margin-top: 2rem;
 }
 
-.next-button:hover {
+.ad-consent-container .next-button:hover {
   background: #bbb;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // ✅ useLocation 추가
-import { auth } from "../api/axiosInstance";
-import "../styles/auth/ad_consent.css"; // ✅ 기존 스타일 유지
+import { auth } from "../../api/axiosInstance";
+import "../../styles/auth/ad_consent.css"; // ✅ 기존 스타일 유지
 
 const API_URL = import.meta.env.VITE_BACKEND_BASE_URL + "/members/";
 

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { auth } from "../api/axiosInstance";
-import ProfileCard from "../components/cards/ProfileCard.tsx";
-import InsuranceButton from "../components/buttons/InsuranceButton.tsx"; // ✅ 보험 리스트로 이동하는 버튼 추가
-import "../styles/pages/familyDetail.css";
+import { auth } from "../../api/axiosInstance";
+import ProfileCard from "../../components/cards/ProfileCard.tsx";
+import InsuranceButton from "../../components/buttons/InsuranceButton.tsx"; // ✅ 보험 리스트로 이동하는 버튼 추가
+import "../../styles/pages/familyDetail.css";
 
 interface MemberDetail {
   id: number;

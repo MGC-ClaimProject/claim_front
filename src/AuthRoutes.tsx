@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/auth/LoginPage.tsx";
 import Signup from "./pages/auth/Signup.tsx";
-import AdConsentPage from "./pages/AdConsentPage";
+import AdConsentPage from "./pages/auth/AdConsentPage";
 import SignupCompletePage from "./pages/auth/SignupCompletePage.tsx";
 
 
