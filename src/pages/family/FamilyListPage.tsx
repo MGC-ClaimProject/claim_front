@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../api/axiosInstance";
-import "../styles/pages/familyList.css";
-import { Member } from "../stores/useAuthStore";
-import AddFamilyModal from "../components/modals/AddFamilyModal.tsx";
-import { RELATION_CHOICES } from "../constants/choices.ts";
+import { auth } from "../../api/axiosInstance";
+import "../../styles/pages/familyList.css";
+import { Member } from "../../stores/useAuthStore";
+import AddFamilyModal from "../../components/modals/AddFamilyModal.tsx";
+import { RELATION_CHOICES } from "../../constants/choices.ts";
 
 const FamilyListPage: React.FC = () => {
   const navigate = useNavigate();

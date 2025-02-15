@@ -4,7 +4,11 @@ html,body{
   height: 100vh;
   width: 100vw;
   overflow: hidden; /* 🔹 페이지 전체 스크롤 방지 */
-
+}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: none;
 }
 
 /* ✅ 글로벌 레이아웃 */

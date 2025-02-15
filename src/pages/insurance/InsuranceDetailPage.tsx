@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { auth } from "../api/axiosInstance";
-import "../styles/pages/insuranceList.css";
+import { auth } from "../../api/axiosInstance";
+import "../../styles/pages/insuranceList.css";
 
 // ✅ 보험 타입 정의
 interface Insurance {
