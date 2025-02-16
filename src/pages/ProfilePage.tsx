@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
 import ProfileCard from "../components/cards/ProfileCard.tsx";
 import InsuranceButton from "../components/buttons/InsuranceButton.tsx";
-import ClaimsButton from "../components/buttons/ClaimsButton.tsx";
+import ClaimsListButton from "../components/buttons/ClaimsListButton.tsx";
 import FamilyButton from "../components/buttons/FamilyButton.tsx";
 import "../styles/pages/profilePage.css";
 
@@ -24,7 +24,7 @@ const ProfilePage: React.FC = () => {
       {/* ✅ 이동 버튼 모음 */}
       <div className="profile-links">
         <InsuranceButton /> {/* 내 보험 리스트로 이동 (memberId 없음) */}
-        <ClaimsButton />
+        <ClaimsListButton />
         <FamilyButton />
       </div>
     </div>

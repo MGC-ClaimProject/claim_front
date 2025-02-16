@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { auth } from "../../api/axiosInstance";
 import ProfileCard from "../../components/cards/ProfileCard.tsx";
-import InsuranceButton from "../../components/buttons/InsuranceButton.tsx"; // ✅ 보험 리스트로 이동하는 버튼 추가
+import InsuranceButton from "../../components/buttons/InsuranceButton.tsx"; // ✅ 보험 리스트 버튼
+import MemberClaimsButton from "../../components/buttons/MemberClaimsButton.tsx"; // ✅ 청구내역 버튼 추가
 import "../../styles/pages/familyDetail.css";
 
 interface MemberDetail {
@@ -44,12 +45,12 @@ const FamilyDetailPage: React.FC = () => {
 
   return (
     <div className="family-detail-container">
-      <h2>👤 {member.name}님의 상세 정보</h2>
       <ProfileCard member={member} />
 
-      {/* ✅ 가족 멤버의 보험 리스트 보러가기 버튼 */}
-      <div className="family-insurance-btn">
+      {/* ✅ 버튼 컨테이너 (세로 정렬) */}
+      <div className="family-button-container">
         <InsuranceButton memberId={member.id} memberName={member.name} />
+        <MemberClaimsButton memberId={member.id} memberName={member.name} /> {/* ✅ 청구내역 버튼 */}
       </div>
     </div>
   );

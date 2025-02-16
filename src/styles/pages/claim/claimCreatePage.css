@@ -42,7 +42,7 @@
 }
 
 /* ✅ 신청자 & 피보험자 정보 가로 정렬 */
-.claim-info {
+.claim-container .claim-info {
   display: flex;
   justify-content: space-between;
   font-size: 1rem;

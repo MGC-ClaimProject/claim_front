@@ -13,7 +13,7 @@
 /* ✅ 전체 박스의 일괄적인 너비 설정 */
 .complete-box {
   width: 100%; /* ✅ 100% 설정 */
-  max-width: 350px; /* ✅ 최대 350px 유지 */
+  max-width: 380px; /* ✅ 최대 350px 유지 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,7 +31,7 @@
 /* ✅ 축하 메시지 박스 - 검은색 + 보더 추가 */
 .message-box {
   width: 90%; /* ✅ 100% 설정 */
-  max-width: 350px; /* ✅ 최대 350px 유지 */
+  max-width: 380px; /* ✅ 최대 350px 유지 */
   padding: 1rem;
   border: 2px solid #ddd; /* ✅ 보더 추가 */
   border-radius: 20px;
@@ -45,7 +45,7 @@
 /* ✅ 정보 안내 박스 - 검은색 */
 .info-box {
   width: 90%;
-  max-width: 350px;
+  max-width: 380px;
   background: #e0e0e0;
   padding: 1rem;
   border-radius: 12px;
@@ -58,7 +58,7 @@
 /* ✅ "내 보험 조회 바로 가기" 버튼 */
 .insurance-button {
   width: 100%;
-  max-width: 350px; /* ✅ 최대 350px 유지 */
+  max-width: 380px; /* ✅ 최대 350px 유지 */
   padding: 1rem;
   background: #ffd700;
   color: black;
@@ -77,7 +77,7 @@
 /* ✅ "시작하기" 버튼 */
 .start-button {
   width: 100%;
-  max-width: 350px; /* ✅ 최대 350px 유지 */
+  max-width: 380px; /* ✅ 최대 350px 유지 */
   padding: 1rem;
   background: #ccc;
   color: black;

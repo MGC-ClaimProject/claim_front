@@ -1,11 +1,12 @@
 /* ✅ 프로필 카드 */
 .profile-card {
+  box-sizing: border-box;
   background: #fff;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   width: 90%;
-  max-width: 400px;
+  max-width: 380px;
   text-align: center;
   position: relative;
   border: 2px solid #4caf50; /* ✅ 초록색 테마 */

@@ -110,9 +110,10 @@ const ClaimAddDocumentsPage: React.FC = () => {
 
       if (response.status === 201) {
         alert("✅ 문서가 성공적으로 업로드되었습니다!");
-        await fetchExistingDocuments(); // ✅ 업로드 후 기존 문서 새로고침
-        setSelectedFiles([]); // ✅ 업로드 후 선택된 파일 초기화
-        setPreviewUrls([]); // ✅ 업로드 후 미리보기 초기화
+
+        // ✅ Claim 상세 페이지로 이동
+        navigate(`/main/claims/${claimId}`);
+
       } else {
         throw new Error("문서 업로드에 실패했습니다.");
       }

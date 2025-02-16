@@ -20,7 +20,7 @@
 /* ✅ 개별 동의 항목 박스 */
 .consent-box {
   width: 90%;
-  max-width: 350px;
+  max-width: 380px;
   background: #f8f8f8;
   padding: 1rem;
   border-radius: 8px;
@@ -66,7 +66,7 @@
 /* ✅ 저장 후 계속하기 버튼 */
 .ad-consent-container .next-button {
   width: 90%;
-  max-width: 350px;
+  max-width: 380px;
   padding: 1rem;
   background: #ccc;
   color: black; /* ✅ 글자색 검은색으로 변경 */

@@ -22,8 +22,8 @@
 /* ✅ 프로필 & 동의 박스 크기 조정 */
 .profile-card,
 .agreement-box {
-  width: 90%; /* 기본적으로 화면 크기에 맞춤 */
-  max-width: 350px; /* 최대 350px로 고정 */
+  width: 100%; /* 기본적으로 화면 크기에 맞춤 */
+  max-width: 380px; /* 최대 350px로 고정 */
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -58,7 +58,7 @@
 /* ✅ 동의 버튼 */
 .agree-button {
   width: 90%;
-  max-width: 350px;
+  max-width: 380px;
   padding: 0.8rem;
   background: #6200ea;
   color: #fff;

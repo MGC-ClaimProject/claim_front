@@ -55,7 +55,7 @@ const ClaimConfirmationPage: React.FC = () => {
     setIsLoading(true);
 
     const requestData = {
-      member: claimData.insured.id,
+      member_id: claimData.insured.id,
       applicant: claimData.applicant?.id || null,
       insured: claimData.insured?.id || null,
       symptoms: claimData.symptoms,
@@ -87,11 +87,13 @@ const ClaimConfirmationPage: React.FC = () => {
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         console.error("❌ 서버 응답 에러:", error.response?.data);
-        alert(`보험 청구 생성 중 오류가 발생했습니다. (${error.response?.status})`);
 
         if (error.response?.status === 409) {
+          // ✅ 중복 청구 존재 -> 모달 띄우기
           setExistingClaim(error.response.data.existing_claim);
           setShowModal(true);
+        } else {
+          alert(`보험 청구 생성 중 오류가 발생했습니다. (${error.response?.status})`);
         }
       } else {
         console.error("❌ 알 수 없는 오류:", error);
@@ -102,6 +104,7 @@ const ClaimConfirmationPage: React.FC = () => {
     }
   };
 
+  // ✅ 취소 버튼 -> 메인 화면 이동
   const handleCancelClaim = () => {
     localStorage.removeItem("claimData");
     setClaimData(null);
@@ -120,22 +123,35 @@ const ClaimConfirmationPage: React.FC = () => {
           </div>
 
           <div className="info-box">
-            <p><strong>🚑</strong> {claimData.incidentType || "-"}</p>
-            <p><strong>💊</strong> {claimData.treatmentType || "-"}</p>
+            <p><strong>🚑 사고 유형:</strong> {claimData.incidentType || "-"}</p>
+            <p><strong>💊 치료 유형:</strong> {claimData.treatmentType || "-"}</p>
             {claimData.treatmentType === "입원" && <p><strong>🏥 입원 일수:</strong> {claimData.hospitalDays || "0"}일</p>}
-            <p><strong>📅</strong> {claimData.incidentDate || "-"}</p>
+            <p><strong>📅 사고 날짜:</strong> {claimData.incidentDate || "-"}</p>
           </div>
 
-          <div className="info-box">
-            {claimData.isSameAsPayoutAccount ? (
-              <p><strong>🔄 출금 계좌와 동일:</strong> ✅ 예</p>
-            ) : (
-              <>
-                <p><strong>🏦 은행:</strong> {getKoreanBankName(claimData.bank)}</p>
-                <p><strong>💳 계좌번호:</strong> {claimData.account || "-"}</p>
-              </>
+          {/* ✅ 서명 미리보기 */}
+          <div className="signature-box">
+            {claimData.applicantSignature && (
+              <div className="signature-preview">
+                <p><strong>🖊️ 신청자 서명</strong></p>
+                <img src={claimData.applicantSignature} alt="신청자 서명" />
+              </div>
+            )}
+            {claimData.insuredSignature && (
+              <div className="signature-preview">
+                <p><strong>🖊️ 피보험자 서명</strong></p>
+                <img src={claimData.insuredSignature} alt="피보험자 서명" />
+              </div>
             )}
           </div>
+          {/* ✅ 계좌번호 정보 추가 (은행명과 계좌번호 나란히 표시) */}
+          <div className="account-box">
+            <div className="account-info">
+              <p><strong>🏦</strong> {claimData.bank ? getKoreanBankName(claimData.bank) : "-"}</p>
+              <p><strong>💳</strong> {claimData.account || "-"}</p>
+            </div>
+          </div>
+
 
           <button className="submit-btn" onClick={() => handleSubmit()} disabled={isLoading}>
             {isLoading ? "저장 중..." : "저장 후 다음으로"}
@@ -143,6 +159,7 @@ const ClaimConfirmationPage: React.FC = () => {
         </>
       )}
 
+      {/* ✅ 중복 청구 모달 */}
       {showModal && existingClaim && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -152,7 +169,7 @@ const ClaimConfirmationPage: React.FC = () => {
             <p><strong>증상:</strong> {existingClaim.symptoms}</p>
 
             <div className="modal-actions">
-              <button className="cancel-btn" onClick={handleCancelClaim}>취소하기</button>
+              <button className="cancel-btn" onClick={handleCancelClaim}>취소</button>
               <button
                 className="continue-btn"
                 onClick={() => {
@@ -160,7 +177,7 @@ const ClaimConfirmationPage: React.FC = () => {
                   handleSubmit(true);
                 }}
               >
-                청구 계속하기
+                계속 진행
               </button>
             </div>
           </div>
