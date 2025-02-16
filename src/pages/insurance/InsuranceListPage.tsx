@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import useFetchInsurances from "../../hooks/useFetchInsurances.ts"; // ✅ Custom Hook 적용
 import AddInsuranceModal from "../../components/modals/AddInsuranceModal.tsx"; // ✅ 모달 컴포넌트 추가
 import "../../styles/pages/insuranceList.css";
@@ -7,18 +7,23 @@ import "../../styles/pages/insuranceList.css";
 const InsuranceListPage: React.FC = () => {
   const { memberId } = useParams<{ memberId?: string }>();
   const location = useLocation();
+  const navigate = useNavigate(); // ✅ 네비게이션 추가
   const memberName = location.state?.memberName || "나";
-  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ 모달 상태 추가
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // ✅ Custom Hook 사용
   const { insurances, loading, totalPremium, fetchInsurances } = useFetchInsurances(memberId);
 
+  // ✅ 상세페이지 이동 함수
+  const handleRowClick = (insuranceId: number) => {
+    navigate(`/main/insurance/${insuranceId}`);
+  };
+
   return (
     <div className="insurance-container">
-      {/* ✅ 제목과 추가 버튼 컨테이너 */}
       <div className="title-container">
         <h1 className="page-title">📌 {memberName}의 가입 보험</h1>
-        <button className="add-insurance-btn" onClick={() => setIsModalOpen(true)}>+</button> {/* ✅ 모달 열기 */}
+        <button className="add-insurance-btn" onClick={() => setIsModalOpen(true)}>+</button>
       </div>
 
       <div className="contract-status-box">
@@ -40,7 +45,11 @@ const InsuranceListPage: React.FC = () => {
         ) : (
           <ul>
             {insurances.map((insurance) => (
-              <li key={insurance.id}>
+              <li
+                key={insurance.id}
+                className="insurance-item"
+                onClick={() => handleRowClick(insurance.id)} // ✅ 클릭 시 상세 페이지로 이동
+              >
                 <strong>{insurance.policy_name || "보험 이름 없음"}</strong> - {insurance.company}
               </li>
             ))}
@@ -48,12 +57,11 @@ const InsuranceListPage: React.FC = () => {
         )}
       </div>
 
-      {/* ✅ 보험 추가 모달 */}
       {isModalOpen && (
         <AddInsuranceModal
           memberId={memberId ? parseInt(memberId, 10) : undefined}
           onClose={() => setIsModalOpen(false)}
-          onInsuranceAdded={fetchInsurances} // ✅ 추가 후 리스트 새로고침
+          onInsuranceAdded={fetchInsurances}
         />
       )}
     </div>

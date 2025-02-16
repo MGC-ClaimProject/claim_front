@@ -5,6 +5,11 @@ html,body{
   width: 100vw;
   overflow: hidden; /* 🔹 페이지 전체 스크롤 방지 */
 }
+
+#id {
+  width: 100%;
+  height: 100%;
+}
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
@@ -18,6 +23,7 @@ textarea:focus-visible {
   width: 100%;
   height: 100vh;
   overflow: hidden; /* 🔹 전체 스크롤 방지 */
+  align-items: center;
 }
 
 /* ✅ 콘텐츠 영역 (스와이프 이동 가능) */
@@ -30,6 +36,7 @@ textarea:focus-visible {
   display: flex;
   justify-content: center;
   width: 100%;
+  max-width: 380px;
 
 }
 

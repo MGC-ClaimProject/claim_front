@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/buttons/profileButtons.css";
 
-const ClaimsButton: React.FC = () => {
+const ClaimsListButton: React.FC = () => {
   const navigate = useNavigate();
 
   return (
@@ -12,4 +12,4 @@ const ClaimsButton: React.FC = () => {
   );
 };
 
-export default ClaimsButton;
+export default ClaimsListButton;

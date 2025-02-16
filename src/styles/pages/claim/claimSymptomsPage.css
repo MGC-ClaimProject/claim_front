@@ -42,14 +42,14 @@
 .info-box span:first-child {
   font-size: 1rem;
   font-weight: bold;
-  color: #fff;
+  color: #000;
   text-align: left;
 }
 
 .info-box span:last-child {
   font-size: 1rem;
   font-weight: bold;
-  color: #fff;
+  color: #000;
   text-align: right;
   flex-grow: 1;
 }
