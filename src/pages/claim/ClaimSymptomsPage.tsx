@@ -9,7 +9,7 @@ interface ClaimData {
   symptoms?: string;
   incidentType?: string;
   treatmentType?: string;
-  hospitalDays?: string | null;
+  hospitalDays?: number;
   incidentDate?: string;
 }
 
@@ -30,8 +30,18 @@ const ClaimSymptomsPage: React.FC = () => {
   const [symptoms, setSymptoms] = useState(claimData?.symptoms || "");
   const [incidentType, setIncidentType] = useState(claimData?.incidentType || ""); // ✅ 상해, 질병, 교통사고 선택
   const [treatmentType, setTreatmentType] = useState(claimData?.treatmentType || ""); // ✅ 입원, 통원 선택
-  const [hospitalDays, setHospitalDays] = useState(claimData?.hospitalDays || ""); // ✅ 입원 일수 입력
+  const [hospitalDays, setHospitalDays] = useState(
+    claimData?.hospitalDays !== undefined ? claimData.hospitalDays : 0
+  ); // ✅ 기본값 0으로 설정
   const [incidentDate, setIncidentDate] = useState(claimData?.incidentDate || ""); // ✅ 사고 날짜 입력
+
+  // ✅ 치료 유형 변경 시 입원일수를 자동으로 설정
+  const handleTreatmentTypeChange = (type: string) => {
+    setTreatmentType(type);
+    if (type === "통원") {
+      setHospitalDays(0); // ✅ 통원일 경우 자동으로 0일 설정
+    }
+  };
 
   // ✅ 다음 단계 이동 핸들러 (로컬 스토리지 업데이트 후 서명 페이지 이동)
   const handleNext = () => {
@@ -46,7 +56,7 @@ const ClaimSymptomsPage: React.FC = () => {
       symptoms,
       incidentType,
       treatmentType,
-      hospitalDays: treatmentType === "입원" ? hospitalDays : null,
+      hospitalDays, // ✅ 통원일 경우 자동으로 0일 저장
       incidentDate, // ✅ 사고 날짜 저장
     };
 
@@ -65,7 +75,7 @@ const ClaimSymptomsPage: React.FC = () => {
     incidentType &&
     treatmentType &&
     incidentDate.trim() &&
-    (treatmentType !== "입원" || hospitalDays.trim());
+    (treatmentType !== "입원" || hospitalDays > 0);
 
   return (
     <div className="symptoms-container">
@@ -113,13 +123,13 @@ const ClaimSymptomsPage: React.FC = () => {
                 type="radio"
                 value={type}
                 checked={treatmentType === type}
-                onChange={(e) => setTreatmentType(e.target.value)}
+                onChange={(e) => handleTreatmentTypeChange(e.target.value)}
               />
               {type}
             </label>
           ))}
 
-          {/* ✅ 입원 일수 입력 필드 (항상 표시) */}
+          {/* ✅ 입원 일수 입력 필드 */}
           {treatmentType === "입원" && (
             <div className="hospital-days-box">
               <label>일수</label>
@@ -127,7 +137,7 @@ const ClaimSymptomsPage: React.FC = () => {
                 type="number"
                 min="1"
                 value={hospitalDays}
-                onChange={(e) => setHospitalDays(e.target.value)}
+                onChange={(e) => setHospitalDays(parseInt(e.target.value, 10) || 1)}
                 placeholder="일수"
               />
             </div>

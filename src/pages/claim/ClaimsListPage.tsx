@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { auth } from "../../api/axiosInstance";
-import { useNavigate, useParams } from "react-router-dom"; // ✅ useParams 추가
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuthStore } from "../../stores/useAuthStore"; // ✅ Zustand 사용
 import { groupClaimsByMember } from "../../utils/groupClaimsByMember";
 import "../../styles/pages/claim/claimsListPage.css";
 
@@ -18,16 +19,17 @@ interface Claim {
   status: string;
 }
 
-type SortKey = "id" | "member_name" | "incident_type" | "incident_date" | "status";
+type SortKey = "member_name" | "incident_type" | "incident_date" | "status";
 
 const ClaimsListPage: React.FC = () => {
   const navigate = useNavigate();
-  const { memberId } = useParams<{ memberId: string }>(); // ✅ URL에서 memberId 가져오기
+  const { memberId } = useParams<{ memberId: string }>();
+  const { setClaimData } = useAuthStore(); // ✅ Zustand에서 setClaimData 가져오기
   const currentYear = new Date().getFullYear().toString();
 
   const [claims, setClaims] = useState<Claim[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeMember, setActiveMember] = useState<number | "ALL">("ALL"); // ✅ 기본값 ALL -> memberId 있을 경우 자동 설정
+  const [activeMember, setActiveMember] = useState<number | "ALL">("ALL");
   const [selectedYear, setSelectedYear] = useState<string>(currentYear);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey | null; direction: "asc" | "desc" }>({
     key: null,
@@ -39,7 +41,6 @@ const ClaimsListPage: React.FC = () => {
   }, [selectedYear]);
 
   useEffect(() => {
-    // ✅ memberId가 있으면 해당 멤버를 기본 선택
     if (memberId) {
       setActiveMember(Number(memberId));
     }
@@ -76,6 +77,11 @@ const ClaimsListPage: React.FC = () => {
       key,
       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
+  };
+
+  const handleRowClick = (claimId: number) => {
+    setClaimData({ claimId }); // ✅ Zustand에 claimId 저장
+    navigate("/main/claims/detail"); // ✅ 상태가 저장된 후 상세페이지로 이동
   };
 
   const sortedClaims = [...filteredClaims].sort((a, b) => {
@@ -145,7 +151,7 @@ const ClaimsListPage: React.FC = () => {
             <table className="claim-table">
               <thead>
                 <tr>
-                  <th onClick={() => handleSort("id")}>📌</th>
+                  <th>No.</th> {/* ✅ 순차적인 번호 */}
                   <th onClick={() => handleSort("member_name")}>👤</th>
                   <th onClick={() => handleSort("incident_type")}>🚑</th>
                   <th onClick={() => handleSort("incident_date")}>📅</th>
@@ -153,13 +159,13 @@ const ClaimsListPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {sortedClaims.map((claim) => (
+                {sortedClaims.map((claim, index) => (
                   <tr
                     key={claim.id}
-                    onClick={() => navigate(`/main/claims/${claim.id}`)}
+                    onClick={() => handleRowClick(claim.id)} // ✅ 클릭 시 상태 저장 후 페이지 이동
                     style={{ cursor: "pointer" }}
                   >
-                    <td>{claim.id}</td>
+                    <td>{index + 1}</td> {/* ✅ 순차적인 번호 표시 */}
                     <td>{claim.member.name}</td>
                     <td>{claim.incident_type}</td>
                     <td>{formatDate(claim.incident_date)}</td>

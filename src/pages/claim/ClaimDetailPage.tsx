@@ -1,28 +1,67 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useAuthStore } from "../../stores/useAuthStore";
+import { useNavigate } from "react-router-dom";
 import { auth } from "../../api/axiosInstance";
 import "../../styles/pages/claim/claimDetailPage.css";
+import { CLAIM_STATUS_CHOICES, INSURANCE_COMPANIES, BANK_CHOICES } from "../../constants/choices";
 
-interface ClaimDetail {
-  id: number;
-  member_name: string;
-  insured_name: string;
-  incident_type: string;
-  incident_date: string;
-  status: string;
-  description: string;
+interface Insurer {
+  company: string;
+}
+
+interface ClaimData {
+  member?: { name: string };
+  incident_date?: string;
+  symptoms?: string;
+  incident_type?: string;
+  treatment_type?: string;
+  hospitalDays?: number;
+  claim_status?: string;
+  bank?: string;
+  account?: string;
+  applicant_signature?: string | null;
+  insured_signature?: string | null;
+  claim_insurers?: Insurer[];
+  documents?: { id: number; created_at: string; page_count?: number; document_url: string }[];
 }
 
 const ClaimDetailPage: React.FC = () => {
-  const { claimId } = useParams<{ claimId: string }>();
-  const [claim, setClaim] = useState<ClaimDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { claimData } = useAuthStore();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [claimDetail, setClaimDetail] = useState<ClaimData | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // ✅ 청구 진행 상태
+
+  const claimId = claimData?.claimId ?? "";
 
   useEffect(() => {
+    if (!claimId) {
+      alert("이전 단계 정보를 찾을 수 없습니다.");
+      navigate("/main/claim");
+    }
+  }, [claimId, navigate]);
+
+  useEffect(() => {
+    if (!claimId) return;
+
     const fetchClaimDetail = async () => {
       try {
-        const response = await auth.get(`/claims/member/${claimId}/`);
-        setClaim(response.data);
+        const response = await auth.get(`/claims/${claimId}/claim/`);
+        const data = response.data;
+
+        const formattedData: ClaimData = {
+          ...data,
+          claim_status: CLAIM_STATUS_CHOICES[data.claim_status] || "정보 없음",
+          incident_type: data.incident_type ?? "정보 없음",
+          treatment_type: data.treatment_type ?? "정보 없음",
+          incident_date: new Date(data.incident_date).toISOString().split("T")[0],
+          bank: BANK_CHOICES[data.bank] || "정보 없음",
+          claim_insurers: (data.claim_insurers ?? []).map((insurer: Insurer) => ({
+            company: INSURANCE_COMPANIES.general?.[insurer.company] || insurer.company,
+          })),
+        };
+
+        setClaimDetail(formattedData);
       } catch (error) {
         console.error("❌ 청구 상세 정보 가져오기 실패:", error);
       } finally {
@@ -33,25 +72,98 @@ const ClaimDetailPage: React.FC = () => {
     fetchClaimDetail();
   }, [claimId]);
 
-  if (loading) {
-    return <p>🔄 로딩 중...</p>;
-  }
+  // ✅ 추가 문서 업로드 페이지로 이동 (claimId 전달)
+  const handleAddDocuments = () => {
+    navigate("/main/claim/add-documents", { state: { claimId } });
+  };
 
-  if (!claim) {
-    return <p>❌ 청구 정보를 불러올 수 없습니다.</p>;
-  }
+  // ✅ 보험사 청구하기 요청
+  const handleSubmitClaim = async () => {
+    if (!claimId) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await auth.post(`/claims/${claimId}/submit/`);
+      if (response.status === 201) {
+        alert("✅ 보험사 청구가 완료되었습니다!");
+        navigate("/main/claim/success"); // ✅ 성공 페이지로 이동
+      } else {
+        throw new Error("보험사 청구 실패");
+      }
+    } catch (error) {
+      console.error("❌ 보험사 청구 실패:", error);
+      alert("🚨 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) return <p>🔄 청구 정보 로딩 중...</p>;
+  if (!claimDetail) return <p>❌ 청구 정보를 불러올 수 없습니다.</p>;
 
   return (
     <div className="claim-detail-container">
-      <h1>📌 청구 상세 정보</h1>
-      <div className="claim-info">
-        <p><strong>👤 신청자:</strong> {claim.member_name}</p>
-        <p><strong>🛡️ 피보험자:</strong> {claim.insured_name}</p>
-        <p><strong>🚑 사고 유형:</strong> {claim.incident_type}</p>
-        <p><strong>📅 사고 날짜:</strong> {claim.incident_date}</p>
-        <p><strong>📄 상태:</strong> {claim.status}</p>
-        <p><strong>📝 설명:</strong> {claim.description || "설명 없음"}</p>
+      <div className="claim-header">
+        <h1>📌 청구 상세 정보</h1>
+        <p className="claim-status"><strong>📄</strong> {claimDetail.claim_status}</p>
       </div>
+
+      <div className="claim-info-grid">
+        <div className="claim-row">
+          <p title="피보험자"><strong>👤</strong> {claimDetail.member?.name ?? "정보 없음"}</p>
+          <p title="사고 날짜"><strong>📅</strong> {claimDetail.incident_date}</p>
+        </div>
+        <div className="claim-row">
+          <p title="사고 유형"><strong>🚑</strong> {claimDetail.incident_type}</p>
+          <p title="치료 유형"><strong>💊</strong> {claimDetail.treatment_type}</p>
+          {claimDetail.treatment_type === "입원" && <p title="입원 일수"><strong>🏥</strong> {claimDetail.hospitalDays}일</p>}
+        </div>
+        <div className="claim-row">
+          <p title="증상"><strong>📋</strong> {claimDetail.symptoms}</p>
+        </div>
+        <div className="claim-row">
+          <p title="은행명"><strong>🏦</strong> {claimDetail.bank}</p>
+          <p title="계좌번호"><strong>💳</strong> {claimDetail.account}</p>
+        </div>
+
+        <div className="claim-row claim-insurers">
+          <strong>📜</strong>
+          {(claimDetail.claim_insurers?.length ?? 0) > 0 ? (
+            claimDetail.claim_insurers?.map((insurer: Insurer, index: number) => (
+              <span key={index}>
+                {insurer.company}
+                {index !== (claimDetail.claim_insurers?.length ?? 0) - 1 ? ", " : ""}
+              </span>
+            ))
+          ) : (
+            <span>정보 없음</span>
+          )}
+        </div>
+
+        <div className="claim-row">
+          <h3>📎 추가 서류 내역</h3>
+          <button className="add-docs-btn" onClick={handleAddDocuments}>➕</button>
+        </div>
+
+        {claimDetail.documents?.length ? (
+          <ul className="document-list">
+            {claimDetail.documents.map((doc) => (
+              <li key={doc.id}>
+                {doc.created_at.split("T")[0]} - {doc.page_count ?? 1}장 -
+                <a href={doc.document_url} target="_blank" rel="noopener noreferrer">
+                  다운로드
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>📂 추가 문서가 없습니다.</p>
+        )}
+      </div>
+
+      <button className="submit-btn" onClick={handleSubmitClaim} disabled={isSubmitting}>
+        {isSubmitting ? "보험사 청구 중..." : "보험사에 청구하기"}
+      </button>
     </div>
   );
 };

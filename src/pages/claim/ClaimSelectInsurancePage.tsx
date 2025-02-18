@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import useClaimNavigation from "../../hooks/useClaimNavigation"; // ✅ 공통 훅 사용
 import useFetchInsurances from "../../hooks/useFetchInsurances"; // ✅ 공통 훅 사용
 import "../../styles/pages/claim/claimSelectInsurancePage.css";
 
@@ -11,7 +12,7 @@ interface InsuranceGroup {
 
 const ClaimSelectInsurancePage: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
+  const { handleNext } = useClaimNavigation(); // ✅ 공통 훅 사용
 
   // ✅ `location.state`에서 데이터 불러오기 + `localStorage` 보완
   const storedClaimData = localStorage.getItem("claimData");
@@ -23,6 +24,14 @@ const ClaimSelectInsurancePage: React.FC = () => {
   const { insurances, loading } = useFetchInsurances(insured?.id);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [companyGroups, setCompanyGroups] = useState<InsuranceGroup[]>([]);
+
+  // ✅ claimData가 없으면 메인 페이지로 이동
+  useEffect(() => {
+    if (!initialClaimData || !insured) {
+      alert("이전 단계 정보를 찾을 수 없습니다.");
+      handleNext({}, "/main/claim"); // ✅ 메인 페이지로 이동
+    }
+  }, [initialClaimData, insured, handleNext]);
 
   // ✅ 보험사별로 그룹화
   useEffect(() => {
@@ -52,7 +61,7 @@ const ClaimSelectInsurancePage: React.FC = () => {
   };
 
   // ✅ 다음 페이지로 이동
-  const handleNext = () => {
+  const handleNextPage = () => {
     if (selectedCompanies.length === 0) {
       alert("보험사를 선택해주세요.");
       return;
@@ -67,23 +76,18 @@ const ClaimSelectInsurancePage: React.FC = () => {
       selectedInsurances.includes(insurance.id)
     );
 
-    // ✅ 기존 데이터에 선택한 보험사 추가
-    const updatedClaimData = {
-      ...initialClaimData, // ✅ 기존 신청자 & 피보험자 데이터 유지
-      selectedInsurances: selectedInsuranceData.map((insurance) => ({
-        id: insurance.id,
-        company: insurance.company,
-        policy_name: insurance.policy_name,
-      })),
-    };
-
-    // ✅ 로컬 스토리지에 저장 (새로고침 대비)
-    localStorage.setItem("claimData", JSON.stringify(updatedClaimData));
-
-    console.log("🔍 ClaimSelectInsurancePage에서 저장되는 데이터:", updatedClaimData);
-
-    // ✅ 다음 페이지(증상 입력)로 이동
-    navigate("/main/claim/symptoms", { state: updatedClaimData });
+    // ✅ 상태 저장 및 다음 페이지 이동
+    handleNext(
+      {
+        ...initialClaimData, // ✅ 기존 신청자 & 피보험자 데이터 유지
+        selectedInsurances: selectedInsuranceData.map((insurance) => ({
+          id: insurance.id,
+          company: insurance.company,
+          policy_name: insurance.policy_name,
+        })),
+      },
+      "/main/claim/symptoms"
+    );
   };
 
   return (
@@ -128,7 +132,7 @@ const ClaimSelectInsurancePage: React.FC = () => {
       {/* ✅ 다음 버튼 */}
       <button
         className={`select-btn ${selectedCompanies.length > 0 ? "active" : ""}`}
-        onClick={handleNext}
+        onClick={handleNextPage}
         disabled={selectedCompanies.length === 0}
       >
         다음 단계로 이동

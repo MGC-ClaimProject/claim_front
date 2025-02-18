@@ -28,7 +28,7 @@
 }
 
 /* ✅ 개별 박스 스타일 */
-.info-box {
+.symptoms-container .info-box {
   flex: 1;
   background: transparent;
   padding: 5px;
@@ -39,17 +39,17 @@
   align-items: center;
 }
 
-.info-box span:first-child {
+.symptoms-container .info-box span:first-child {
   font-size: 1rem;
   font-weight: bold;
-  color: #000;
+  color: #fff;
   text-align: left;
 }
 
 .info-box span:last-child {
   font-size: 1rem;
   font-weight: bold;
-  color: #000;
+  color: #fff;
   text-align: right;
   flex-grow: 1;
 }

@@ -1,6 +1,8 @@
 /* 📜 청구 정보 확인 컨테이너 */
 .confirmation-container {
-  max-width: 420px;
+  box-sizing: border-box;
+  width: 90%;
+  max-width: 380px;
   margin: auto;
   padding: 20px;
   background: #fff;
@@ -10,14 +12,43 @@
   color: black;
 }
 
-/* 📜 정보 박스 스타일 */
+/* ✅ 첫 번째 줄: 신청자 & 피보험자 가로 정렬 */
 .info-box {
-  background: #f9f9f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
   padding: 10px;
-  margin: 10px 0;
   border-radius: 8px;
   border: 1px solid #ddd;
   text-align: left;
+  margin-bottom: 10px;
+}
+
+/* ✅ 두 번째 줄: 사고 유형, 치료 유형, 입원 일수, 사고 날짜 가로 정렬 */
+.incident-info-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+  gap: 10px;
+}
+
+/* ✅ 세 번째 줄: 증상을 한 줄로 정렬 */
+.symptoms-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+  margin-top: 10px;
 }
 
 /* 🖊️ 서명 미리보기 */
@@ -39,6 +70,7 @@
   border-radius: 5px;
 }
 
+/* 🏦 계좌 정보 박스 */
 .account-box {
   display: flex;
   justify-content: space-between;

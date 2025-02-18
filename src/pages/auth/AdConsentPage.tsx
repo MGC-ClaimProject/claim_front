@@ -13,8 +13,8 @@ const AdConsentPage: React.FC = () => {
   // ✅ 광고 동의 선택 상태
   const [consents, setConsents] = useState([
     { id: 1, title: "광고성 문자 안내 1", agreed: false },
-    { id: 2, title: "광고성 문자 안내 2", agreed: false },
-    { id: 3, title: "광고성 문자 안내 3", agreed: false },
+    // { id: 2, title: "광고성 문자 안내 2", agreed: false },
+    // { id: 3, title: "광고성 문자 안내 3", agreed: false },
   ]);
 
   const handleConsentChange = (id: number, agreed: boolean) => {

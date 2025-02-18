@@ -23,14 +23,33 @@
   padding: 5px 5px 0 5px;
 }
 
-/* ✅ 신청자 & 피보험자 선택 창 스타일 */
+/* ✅ 신청자 정보 (왼쪽 라벨, 오른쪽 이름, 박스 제거) */
+.claim-applicant {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: black;
+  padding: 0 10px;
+}
+
+.claim-applicant span:last-child {
+  font-weight: normal;
+  text-align: right;
+  color: black;
+  flex-grow: 1;
+  margin-left: 10px;
+}
+
+
+/* ✅ 피보험자 선택 창 스타일 */
 .claim-label {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
   margin-bottom: 10px;
-  color: black; /* ✅ 선택 창 라벨 검정색 */
 }
 
 .claim-label select {
@@ -47,7 +66,7 @@
   justify-content: space-between;
   font-size: 1rem;
   margin-top: 5px;
-  color: black; /* ✅ 정보 텍스트 검정색 */
+  color: black;
 }
 
 .claim-info div {
@@ -60,7 +79,7 @@
 .claim-info label {
   font-weight: bold;
   margin-bottom: 3px;
-  color: black; /* ✅ 라벨 글씨 검정색 */
+  color: black;
 }
 
 .claim-info span {
@@ -70,7 +89,7 @@
   text-align: center;
   border: 1px solid #ccc;
   border-radius: 5px;
-  color: black; /* ✅ 스팬 글씨 검정색 */
+  color: black;
 }
 
 /* ✅ 버튼 스타일 */
@@ -79,7 +98,7 @@
   width: 100%;
   padding: 10px;
   background: gray;
-  color: black; /* ✅ 버튼 글씨 검정색 */
+  color: black;
   border: none;
   border-radius: 5px;
   cursor: not-allowed;
@@ -87,7 +106,7 @@
 
 .claim-container .next-button.active {
   background: #007bff;
-  color: white; /* ✅ 활성화된 버튼 글씨 흰색 */
+  color: white;
   cursor: pointer;
 }
 
