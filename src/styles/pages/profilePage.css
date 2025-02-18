@@ -1,11 +1,9 @@
 /* ✅ 전체 컨테이너 */
 .profile-container {
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
   width: 100%;
   max-width: 380px;
   background: rgba(255,255,255,0);
@@ -25,10 +23,10 @@
 /* ✅ 프로필 카드 */
 .profile-card {
   background: #fff;
-  padding: 1.5rem;
+  padding: 1rem;
   border-radius: 12px;
   box-shadow: 0px 4px 8px rgba(255, 64, 129, 0.2);
-  width: 90%;
+  width: 100%;
   max-width: 380px;
   text-align: center;
   border: 2px solid #ff4081;
@@ -86,18 +84,15 @@
 
 }
 .profile-links>button{
-
   display: flex;
   justify-content: center;
   background: transparent;
   border: 2px solid #ff4081;
   color: #ff4081;
-  padding: 0.8rem;
   border-radius: 8px;
   cursor: pointer;
   width: 100%;
   font-size: 1rem;
   font-weight: bold;
-  margin-bottom: 1rem;
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 }

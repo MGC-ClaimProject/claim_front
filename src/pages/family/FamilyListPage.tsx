@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../api/axiosInstance";
+import { useAuthStore, Member } from "../../stores/useAuthStore";
 import "../../styles/pages/familyList.css";
-import { Member } from "../../stores/useAuthStore";
 import AddFamilyModal from "../../components/modals/AddFamilyModal.tsx";
 import { RELATION_CHOICES } from "../../constants/choices.ts";
 
 const FamilyListPage: React.FC = () => {
   const navigate = useNavigate();
+  const { setSelectedMemberId } = useAuthStore(); // ✅ Zustand에서 함수 가져오기
   const [members, setMembers] = useState<Member[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -15,10 +16,7 @@ const FamilyListPage: React.FC = () => {
     const fetchMembers = async () => {
       try {
         const response = await auth.get("/members/");
-        const members: Member[] = response.data;
-
-        // ✅ 본인(Self)을 제외한 멤버만 필터링
-        const filteredMembers = members.filter((member) => member.relation !== "Self");
+        const filteredMembers = response.data.filter((member: Member) => member.relation !== "Self");
         setMembers(filteredMembers);
       } catch (error) {
         console.error("❌ 가족 목록 가져오기 실패:", error);
@@ -27,6 +25,11 @@ const FamilyListPage: React.FC = () => {
 
     fetchMembers();
   }, []);
+
+  const handleMemberClick = (memberId: number) => {
+    setSelectedMemberId(memberId); // ✅ 상태 저장
+    navigate("/main/family/detail", { state: { memberId }}); // ✅ 상태 유지한 채 상세 페이지 이동
+  };
 
   return (
     <div className="family-container">
@@ -43,7 +46,7 @@ const FamilyListPage: React.FC = () => {
             <div
               key={member.id}
               className="family-card"
-              onClick={() => navigate(`/main/family/${member.id}`)}
+              onClick={() => handleMemberClick(member.id)}
             >
               <p className="family-name">{member.name} 님</p>
               <p className="family-relation">

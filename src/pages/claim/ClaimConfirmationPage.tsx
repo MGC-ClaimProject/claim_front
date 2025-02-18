@@ -1,95 +1,116 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { BANK_CHOICES } from "../../constants/choices";
+import { useAuthStore, ClaimData } from "../../stores/useAuthStore";
+import { useNavigate } from "react-router-dom";
 import "../../styles/pages/claim/claimConfirmationPage.css";
 import { auth } from "../../api/axiosInstance";
 import { AxiosError } from "axios";
 
-interface ClaimData {
-  applicant?: { id: number; name: string };
-  insured?: { id: number; name: string; relation: string };
-  symptoms?: string;
-  incidentType?: string;
-  treatmentType?: string;
-  hospitalDays?: string | null;
-  incidentDate?: string;
-  applicantSignature?: string | null;
-  insuredSignature?: string | null;
-  bank?: string | null;
-  account?: string | null;
-  isSameAsPayoutAccount?: boolean;
-  selectedInsurances?: { id: number; company: string; policy_name: string }[];
-}
-
 const ClaimConfirmationPage: React.FC = () => {
-  const location = useLocation();
+  const { claimData, setClaimData } = useAuthStore();
   const navigate = useNavigate();
-  const [claimData, setClaimData] = useState<ClaimData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [existingClaim, setExistingClaim] = useState<ClaimData | null>(null);
 
-  useEffect(() => {
-    const storedClaimData = localStorage.getItem("claimData");
-    const dataFromState = location.state || (storedClaimData ? JSON.parse(storedClaimData) : null);
+  // ✅ `claimData`가 없을 경우 기본값 설정 (undefined 방지)
+  const safeClaimData: ClaimData = claimData ?? {
+    insured: { id: 0, name: "", phone: "", birth: "", gender: "", relation: "" },
+    applicant: { id: 0, name: "", phone: "", birth: "", gender: "", relation: "" },
+    symptoms: "",
+    incidentType: "",
+    treatmentType: "",
+    hospitalDays: 0,
+    incidentDate: "",
+    applicantSignature: "",
+    insuredSignature: "",
+    bank: null,
+    account: null,
+    isSameAsPayoutAccount: false,
+    claimStatus: "",
+    createdAt: "",
+    updatedAt: "",
+    claimInsurers: [],
+    documents: [],
+  };
 
-    if (dataFromState) {
-      console.log("🔍 ClaimConfirmationPage 데이터:", dataFromState);
-      setClaimData(dataFromState);
-    } else {
+  useEffect(() => {
+    if (!claimData || !claimData.insured && !claimData.claimId) {
       alert("이전 단계 정보를 찾을 수 없습니다.");
       navigate("/main/claim");
     }
-  }, [location.state, navigate]);
+  }, [claimData, navigate]);
 
-  const getKoreanBankName = (bankKey: string | null | undefined) => {
+  // ✅ 보험사 중복 제거 (이름만 저장)
+  const getUniqueInsuranceCompanies = () => {
+    if (!safeClaimData.selectedInsurances) return [];
+
+    const uniqueCompanies = Array.from(
+      new Set(safeClaimData.selectedInsurances.map((insurance) => insurance.company))
+    );
+
+    return uniqueCompanies.map((company) => ({ company })); // ✅ [{ company: "현대해상" }] 형태로 변환
+  };
+
+  // ✅ 은행 코드 -> 한글 변환 함수
+  const getKoreanBankName = (bankKey: string | null | undefined): string => {
+    const BANK_CHOICES: Record<string, string> = {
+      kb: "국민은행",
+      shinhan: "신한은행",
+      woori: "우리은행",
+      hana: "하나은행",
+      nh: "농협은행",
+      ibk: "기업은행",
+    };
+
     return bankKey && BANK_CHOICES[bankKey] ? BANK_CHOICES[bankKey] : "-";
   };
 
-  const handleSubmit = async (bypassDuplicateCheck = false) => {
-    if (!claimData || !claimData.insured || !claimData.insured.id) {
+  const handleSubmit = async (bypassDuplicateCheck: boolean = false) => {
+    if (!safeClaimData.insured || !safeClaimData.insured.id) {
       alert("❌ 피보험자 정보가 없습니다. 다시 진행해주세요.");
       return;
     }
 
     setIsLoading(true);
 
-    const requestData = {
-      member_id: claimData.insured.id,
-      applicant: claimData.applicant?.id || null,
-      insured: claimData.insured?.id || null,
-      symptoms: claimData.symptoms,
-      incident_type: claimData.incidentType,
-      treatment_type: claimData.treatmentType,
-      hospital_days: claimData.hospitalDays ?? 0,
-      incident_date: claimData.incidentDate,
-      applicant_signature: claimData.applicantSignature,
-      insured_signature: claimData.insuredSignature,
-      bank: claimData.isSameAsPayoutAccount ? null : claimData.bank,
-      account: claimData.isSameAsPayoutAccount ? null : claimData.account,
-      is_same_as_payout_account: claimData.isSameAsPayoutAccount,
-      claim_insurers: claimData.selectedInsurances?.map((insurance) => ({
-        company: insurance.company,
-        policy_name: insurance.policy_name,
-      })) || [],
-      bypass_duplicate_check: bypassDuplicateCheck,
-    };
-
-    console.log("📤 보낼 데이터:", requestData);
-
     try {
-      const response = await auth.post(`/claims/${claimData.insured.id}/`, requestData);
+      const response = await auth.post(`/claims/${safeClaimData.insured.id}/`, {
+        member_id: safeClaimData.insured.id,
+        applicant: safeClaimData.applicant?.id || null,
+        insured: safeClaimData.insured?.id || null,
+        symptoms: safeClaimData.symptoms,
+        incident_type: safeClaimData.incidentType,
+        treatment_type: safeClaimData.treatmentType,
+        hospital_days: safeClaimData.hospitalDays,
+        incident_date: safeClaimData.incidentDate,
+        applicant_signature: safeClaimData.applicantSignature,
+        insured_signature: safeClaimData.insuredSignature,
+        bank: safeClaimData.isSameAsPayoutAccount ? null : safeClaimData.bank,
+        account: safeClaimData.isSameAsPayoutAccount ? null : safeClaimData.account,
+        is_same_as_payout_account: safeClaimData.isSameAsPayoutAccount,
+        claim_insurers: getUniqueInsuranceCompanies(), // ✅ 보험사 중복 제거 후 저장
+        bypass_duplicate_check: bypassDuplicateCheck,
+      });
 
-      if (response.status === 201) {
+       if (response.status === 201) {
         console.log("✅ 청구 생성 성공:", response.data);
-        navigate("/main/claim/add-documents", { state: { claimId: response.data.id } });
+
+        const newClaimId = response.data.id;
+
+        // ✅ 기존 claimData 삭제 후 새로운 claimId만 저장
+        setClaimData({ claimId: newClaimId });
+
+        // ✅ 로컬 스토리지에서 claimData 삭제
+        localStorage.removeItem("claimData");
+        console.log("📂 claimData 삭제됨, 새로운 claimId 저장됨:", newClaimId);
+
+        // ✅ navigate 실행 (이제 상태에서 claimId를 받아옴)
+        navigate(`/main/claim/add-documents/`);
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         console.error("❌ 서버 응답 에러:", error.response?.data);
-
         if (error.response?.status === 409) {
-          // ✅ 중복 청구 존재 -> 모달 띄우기
           setExistingClaim(error.response.data.existing_claim);
           setShowModal(true);
         } else {
@@ -104,10 +125,9 @@ const ClaimConfirmationPage: React.FC = () => {
     }
   };
 
-  // ✅ 취소 버튼 -> 메인 화면 이동
+
   const handleCancelClaim = () => {
-    localStorage.removeItem("claimData");
-    setClaimData(null);
+    setShowModal(false);
     navigate("/main");
   };
 
@@ -117,16 +137,23 @@ const ClaimConfirmationPage: React.FC = () => {
 
       {claimData && (
         <>
+          {/* ✅ 첫 번째 줄: 신청자 & 피보험자 가로 정렬 */}
           <div className="info-box">
             <p><strong>👤 신청자:</strong> {claimData.applicant?.name || "-"}</p>
-            <p><strong>🛡️ 피보험자:</strong> {claimData.insured?.name || "-"} / {claimData.insured?.relation || "-"}</p>
+            <p><strong>🛡️ 피보험자:</strong> {claimData.insured?.name || "-"}</p>
           </div>
 
-          <div className="info-box">
-            <p><strong>🚑 사고 유형:</strong> {claimData.incidentType || "-"}</p>
-            <p><strong>💊 치료 유형:</strong> {claimData.treatmentType || "-"}</p>
-            {claimData.treatmentType === "입원" && <p><strong>🏥 입원 일수:</strong> {claimData.hospitalDays || "0"}일</p>}
-            <p><strong>📅 사고 날짜:</strong> {claimData.incidentDate || "-"}</p>
+          {/* ✅ 두 번째 줄: 사고 유형, 치료 유형, 입원 일수, 사고 날짜 가로 정렬 */}
+          <div className="incident-info-box">
+            <p><strong>🚑</strong> {claimData.incidentType || "-"}</p>
+            <p><strong>💊</strong> {claimData.treatmentType || "-"}</p>
+            {claimData.treatmentType === "입원" && <p><strong>🏥</strong> {claimData.hospitalDays || "0"}일</p>}
+            <p><strong>📅</strong> {claimData.incidentDate || "-"}</p>
+          </div>
+
+          {/* ✅ 세 번째 줄: 증상 한 줄 정렬 */}
+          <div className="symptoms-box">
+            <p><strong>📋 증상:</strong> {claimData.symptoms || "증상 정보 없음"}</p>
           </div>
 
           {/* ✅ 서명 미리보기 */}
@@ -144,14 +171,14 @@ const ClaimConfirmationPage: React.FC = () => {
               </div>
             )}
           </div>
-          {/* ✅ 계좌번호 정보 추가 (은행명과 계좌번호 나란히 표시) */}
+
+          {/* ✅ 계좌번호 정보 추가 */}
           <div className="account-box">
             <div className="account-info">
-              <p><strong>🏦</strong> {claimData.bank ? getKoreanBankName(claimData.bank) : "-"}</p>
-              <p><strong>💳</strong> {claimData.account || "-"}</p>
+              <p><strong>🏦 은행:</strong> {claimData.bank ? getKoreanBankName(claimData.bank) : "-"}</p>
+              <p><strong>💳 계좌번호:</strong> {claimData.account || "-"}</p>
             </div>
           </div>
-
 
           <button className="submit-btn" onClick={() => handleSubmit()} disabled={isLoading}>
             {isLoading ? "저장 중..." : "저장 후 다음으로"}

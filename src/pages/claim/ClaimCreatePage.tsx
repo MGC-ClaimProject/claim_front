@@ -1,44 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ 페이지 이동을 위해 추가
-import { auth } from "../../api/axiosInstance";
-import "../../styles/pages/claim/claimCreatePage.css"; // ✅ 스타일 적용
-
-// ✅ 멤버 정보 타입 정의
-interface Member {
-  id: number;
-  name: string;
-  phone: string;
-  birth: string;
-  relation: string;
-}
+import React, { useEffect, useState } from "react";
+import { useAuthStore, Member, User } from "../../stores/useAuthStore"; // ✅ Zustand 상태 사용
+import useClaimNavigation from "../../hooks/useClaimNavigation"; // ✅ 페이지 이동 훅 사용
+import "../../styles/pages/claim/claimCreatePage.css";
 
 const ClaimCreatePage: React.FC = () => {
-  const navigate = useNavigate();
+  const { user, members, fetchMembers } = useAuthStore(); // ✅ 로그인한 유저 정보 추가
+  const { handleNext } = useClaimNavigation(); // ✅ 공통 훅 사용
   const [agree, setAgree] = useState(false);
-  const [members, setMembers] = useState<Member[]>([]);
-  const [selectedApplicant, setSelectedApplicant] = useState<Member | null>(null);
   const [selectedInsured, setSelectedInsured] = useState<Member | null>(null);
+
+  // ✅ 신청자를 로그인한 유저로 자동 설정
+  const selectedApplicant: User | null = user || null;
 
   // ✅ 가족 멤버 데이터 가져오기
   useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const response = await auth.get("/members/");
-        setMembers(response.data);
-      } catch (error) {
-        console.error("❌ 가족 멤버 정보 가져오기 실패:", error);
-      }
-    };
-
-    fetchMembers();
-  }, []);
-
-  // ✅ 신청자 선택 핸들러
-  const handleApplicantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const memberId = Number(event.target.value);
-    const member = members.find((m) => m.id === memberId) || null;
-    setSelectedApplicant(member);
-  };
+    if (members.length === 0) {
+      fetchMembers();
+    }
+  }, [members, fetchMembers]);
 
   // ✅ 피보험자 선택 핸들러
   const handleInsuredChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -49,61 +28,42 @@ const ClaimCreatePage: React.FC = () => {
 
   // ✅ 동의 체크박스 변경 핸들러
   const handleAgreeChange = () => {
-    setAgree(!agree);
+    setAgree((prev) => !prev);
   };
 
   // ✅ 다음 페이지 이동 핸들러
-  const handleNext = () => {
+  const handleNextPage = () => {
     if (!agree) {
       alert("필수 동의 항목에 체크해야 진행할 수 있습니다.");
       return;
     }
     if (!selectedApplicant || !selectedInsured) {
-      alert("신청자와 피보험자를 선택해주세요.");
+      alert("신청자와 피보험자를 확인해주세요.");
       return;
     }
 
-    // ✅ 저장할 데이터 객체
-    const claimData = {
-      applicant: selectedApplicant,
-      insured: selectedInsured,
-    };
-
-    // ✅ 로컬 스토리지에 데이터 저장 (새로고침해도 유지되도록)
-    localStorage.setItem("claimData", JSON.stringify(claimData));
-
-    console.log("✅ ClaimCreatePage에서 저장되는 데이터:", claimData);
-
-    // ✅ 선택한 정보와 함께 다음 페이지로 이동
-    navigate("/main/select-insurance", { state: claimData });
+    // ✅ 상태 업데이트 및 페이지 이동
+    handleNext(
+      {
+        applicant: {
+          id: selectedApplicant.id,
+          name: selectedApplicant.user_name,
+        },
+        insured: selectedInsured,
+      },
+      "/main/select-insurance"
+    );
   };
 
   return (
     <div className="claim-container">
       <div className="claim-title"><p>📌 보험 청구서 작성</p></div>
 
-      {/* ✅ 신청자 정보 입력 박스 */}
+      {/* ✅ 신청자 정보 (자동 설정) */}
       <div className="claim-box">
-        <div className="claim-label">
+        <div className="claim-applicant">
           <span>👤 신청자</span>
-          <select onChange={handleApplicantChange} defaultValue="">
-            <option value="" disabled>신청자 선택</option>
-            {members.map((member) => (
-              <option key={member.id} value={member.id}>
-                {member.name} ({member.relation})
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="claim-info">
-          <div>
-            <label>이름</label>
-            <span>{selectedApplicant?.name || "-"}</span>
-          </div>
-          <div>
-            <label>전화번호</label>
-            <span>{selectedApplicant?.phone || "-"}</span>
-          </div>
+          <span>{selectedApplicant?.user_name || "-"}</span>
         </div>
       </div>
 
@@ -142,7 +102,7 @@ const ClaimCreatePage: React.FC = () => {
       </div>
 
       {/* ✅ 다음으로 버튼 */}
-      <button className={`next-button ${agree ? "active" : ""}`} onClick={handleNext} disabled={!agree}>
+      <button className={`next-button ${agree ? "active" : ""}`} onClick={handleNextPage} disabled={!agree}>
         모두 동의하고 다음으로
       </button>
     </div>

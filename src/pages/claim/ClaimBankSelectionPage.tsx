@@ -1,43 +1,33 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useAuthStore } from "../../stores/useAuthStore"; // ✅ Zustand 사용
+import useClaimNavigation from "../../hooks/useClaimNavigation"; // ✅ 공통 훅 사용
 import { BANK_CHOICES } from "../../constants/choices";
-import "../../styles/pages/claim/claimBankSelectionPage.css"; // ✅ 스타일 적용
-
-// ✅ Claim 데이터 타입 정의
-interface ClaimData {
-  applicant?: { name: string };
-  insured?: { name: string; relation: string };
-  symptoms?: string;
-  incidentType?: string;
-  treatmentType?: string;
-  hospitalDays?: string | null;
-  incidentDate?: string;
-  applicantSignature?: string | null;
-  insuredSignature?: string | null;
-  bank?: string | null;
-  account?: string | null;
-  isSameAsPayoutAccount?: boolean;
-}
+import "../../styles/pages/claim/claimBankSelectionPage.css";
 
 const ClaimBankSelectionPage: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { claimData } = useAuthStore(); // ✅ Zustand에서 전역 상태 가져오기
+  const { handleNext } = useClaimNavigation(); // ✅ 공통 함수 사용
 
-  // ✅ 기존 데이터 가져오기 (로컬 스토리지 또는 이전 페이지 데이터)
-  const storedClaimData = localStorage.getItem("claimData");
-  const claimData: ClaimData | null =
-    location.state || (storedClaimData ? JSON.parse(storedClaimData) : null);
-
-  if (!claimData) {
-    alert("이전 단계 정보를 찾을 수 없습니다. 다시 진행해주세요.");
-    navigate("/main/claim");
-  }
-
+  // ✅ Hook은 항상 동일한 순서로 호출되어야 함
   const [selectedBank, setSelectedBank] = useState<string>(claimData?.bank || "");
   const [accountNumber, setAccountNumber] = useState<string>(claimData?.account || "");
   const [isSameAccount, setIsSameAccount] = useState<boolean>(claimData?.isSameAsPayoutAccount || false);
 
+  // ✅ `claimData`가 없을 경우 메인 페이지로 이동 (useEffect 사용)
+  useEffect(() => {
+    if (!claimData) {
+      alert("이전 단계 정보를 찾을 수 없습니다. 다시 진행해주세요.");
+      handleNext({}, "/main/claim"); // ✅ 메인 페이지로 이동
+    }
+  }, [claimData, handleNext]);
+
   const isFormValid = isSameAccount || (selectedBank && accountNumber.trim()); // ✅ 체크박스 또는 입력값 확인
+
+  // ✅ 숫자만 입력 가능하도록 처리
+  const handleAccountNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, ""); // ✅ 숫자가 아닌 값 제거
+    setAccountNumber(numericValue);
+  };
 
   // ✅ 저장 후 확인 페이지로 이동
   const handleSubmit = () => {
@@ -47,7 +37,7 @@ const ClaimBankSelectionPage: React.FC = () => {
     }
 
     // ✅ 기존 데이터에 계좌 정보 추가
-    const updatedClaimData: ClaimData = {
+    const updatedClaimData = {
       ...claimData,
       bank: isSameAccount ? "출금계좌와 동일" : selectedBank,
       account: isSameAccount ? "출금계좌와 동일" : accountNumber,
@@ -56,11 +46,8 @@ const ClaimBankSelectionPage: React.FC = () => {
 
     console.log("🔍 ClaimBankSelectionPage에서 저장되는 데이터:", updatedClaimData);
 
-    // ✅ 로컬 스토리지에 저장 (새로고침 대비)
-    localStorage.setItem("claimData", JSON.stringify(updatedClaimData));
-
-    // ✅ 확인 페이지로 이동 (모든 정보 전달)
-    navigate("/main/claim/confirmation", { state: updatedClaimData });
+    // ✅ 공통 `handleNext` 사용하여 상태 저장 및 페이지 이동
+    handleNext(updatedClaimData, "/main/claim/confirmation");
   };
 
   return (
@@ -94,7 +81,7 @@ const ClaimBankSelectionPage: React.FC = () => {
             onChange={(e) => setSelectedBank(e.target.value)}
             disabled={isSameAccount} // ✅ 체크 시 비활성화
           >
-            <option value="">은행을 선택하세요</option>
+            <option value="">은행명</option>
             {Object.entries(BANK_CHOICES).map(([key, value]) => (
               <option key={key} value={key}>
                 {value}
@@ -103,13 +90,13 @@ const ClaimBankSelectionPage: React.FC = () => {
           </select>
         </div>
 
-        {/* ✅ 계좌번호 입력 */}
+        {/* ✅ 계좌번호 입력 (숫자만 허용) */}
         <div className="input-group">
           <label>계좌번호</label>
           <input
             type="text"
             value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
+            onChange={handleAccountNumberChange} // ✅ 숫자만 입력 가능하도록 변경
             placeholder="계좌번호를 입력하세요"
             disabled={isSameAccount} // ✅ 체크 시 비활성화
           />

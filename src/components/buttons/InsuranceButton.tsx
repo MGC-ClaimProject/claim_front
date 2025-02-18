@@ -16,9 +16,9 @@ const InsuranceButton: React.FC<InsuranceButtonProps> = ({ memberId, memberName=
 
   const handleClick = () => {
     if (memberId) {
-      navigate(`/main/${memberId}/insurance`, { state: { memberName } }); // ✅ 멤버 ID와 이름 전달
+      navigate(`/main/insurances`, { state: { memberId,memberName } }); // ✅ 멤버 ID와 이름 전달
     } else {
-      navigate(`/main/${userMemberId}/insurance`, { state: { memberName: "나" } }); // ✅ 내 보험 리스트
+      navigate(`/main/insurances`, { state: { userMemberId,memberName: "나" } }); // ✅ 내 보험 리스트
     }
   };
 

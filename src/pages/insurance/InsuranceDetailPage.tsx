@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom"; // ✅ useLocation 추가
 import { auth } from "../../api/axiosInstance";
 import "../../styles/pages/insuranceDetail.css";
 
@@ -12,14 +12,23 @@ interface Insurance {
 }
 
 const InsuranceDetailPage: React.FC = () => {
-  const { insuranceId } = useParams<{ insuranceId: string }>();
-  const [insurance, setInsurance] = useState<Insurance | null>(null); // ✅ 타입 지정
+  const location = useLocation();
+  const { insuranceId: paramInsuranceId } = useParams<{ insuranceId?: string }>(); // ✅ useParams에서 insuranceId 가져오기
+  const insuranceId = location.state?.insuranceId || paramInsuranceId; // ✅ state에서 insuranceId 가져오고 없으면 param 사용
+
+  const [insurance, setInsurance] = useState<Insurance | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!insuranceId) {
+      console.error("❌ insuranceId가 없습니다.");
+      return;
+    }
+
     const fetchInsuranceDetail = async () => {
       try {
-        const response = await auth.get(`/insurances/member/${insuranceId}/`);
+        console.log(`📡 보험 상세 정보 요청: insuranceId=${insuranceId}`);
+        const response = await auth.get(`/insurances/${insuranceId}/insurance/`);
         setInsurance(response.data);
       } catch (error) {
         console.error("❌ 보험 상세 정보 가져오기 실패:", error);
@@ -30,6 +39,10 @@ const InsuranceDetailPage: React.FC = () => {
 
     fetchInsuranceDetail();
   }, [insuranceId]);
+
+  if (!insuranceId) {
+    return <p>❌ 유효한 insuranceId가 없습니다.</p>;
+  }
 
   if (loading) {
     return <p>🔄 로딩 중...</p>;

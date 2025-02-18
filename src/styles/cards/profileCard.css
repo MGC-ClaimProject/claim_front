@@ -5,11 +5,11 @@
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  width: 90%;
+  width: 100%;
   max-width: 380px;
   text-align: center;
   position: relative;
-  border: 2px solid #4caf50; /* ✅ 초록색 테마 */
+  border: 2px solid #ff5252; /* ✅ 초록색 테마 */
 }
 
 /* ✅ 제목 & 취소 버튼 정렬 */
@@ -17,7 +17,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+
 }
 
 /* ✅ 취소 (X) 버튼 - 투명한 배경 적용 */
