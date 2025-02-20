@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { auth } from "../../api/axiosInstance";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../stores/useAuthStore"; // ✅ Zustand 사용
 import { groupClaimsByMember } from "../../utils/groupClaimsByMember";
 import "../../styles/pages/claim/claimsListPage.css";
+import { CLAIM_STATUS_CHOICES } from "../../constants/choices"; // ✅ 청구 상태 매핑
 
 interface Member {
   id: number;
@@ -16,15 +17,16 @@ interface Claim {
   insured_name: string;
   incident_type: string;
   incident_date: string;
-  status: string;
+  claim_status: string;
 }
 
 type SortKey = "member_name" | "incident_type" | "incident_date" | "status";
 
 const ClaimsListPage: React.FC = () => {
   const navigate = useNavigate();
-  const { memberId } = useParams<{ memberId: string }>();
-  const { setClaimData } = useAuthStore(); // ✅ Zustand에서 setClaimData 가져오기
+  const location = useLocation();
+  const { setClaimData, claimData } = useAuthStore(); // ✅ Zustand에서 setClaimData 가져오기
+  const memberId = location.state?.memberId ?? claimData?.memberId; // ✅ 상태에서 memberId 가져오기
   const currentYear = new Date().getFullYear().toString();
 
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -99,6 +101,10 @@ const ClaimsListPage: React.FC = () => {
         aValue = a.member.name;
         bValue = b.member.name;
         break;
+      case "status":
+        aValue = CLAIM_STATUS_CHOICES[a.claim_status] || "알 수 없음";
+        bValue = CLAIM_STATUS_CHOICES[b.claim_status] || "알 수 없음";
+        break;
       default:
         aValue = a[sortConfig.key];
         bValue = b[sortConfig.key];
@@ -155,7 +161,7 @@ const ClaimsListPage: React.FC = () => {
                   <th onClick={() => handleSort("member_name")}>👤</th>
                   <th onClick={() => handleSort("incident_type")}>🚑</th>
                   <th onClick={() => handleSort("incident_date")}>📅</th>
-                  <th onClick={() => handleSort("status")}>📄</th>
+                  <th onClick={() => handleSort("status")}>📌</th> {/* ✅ 기존 status 유지 */}
                 </tr>
               </thead>
               <tbody>
@@ -169,7 +175,7 @@ const ClaimsListPage: React.FC = () => {
                     <td>{claim.member.name}</td>
                     <td>{claim.incident_type}</td>
                     <td>{formatDate(claim.incident_date)}</td>
-                    <td>{claim.status}</td>
+                    <td>{CLAIM_STATUS_CHOICES[claim.claim_status] || ""}</td> {/* ✅ 기존 status 활용 */}
                   </tr>
                 ))}
               </tbody>

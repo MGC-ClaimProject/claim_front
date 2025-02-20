@@ -63,7 +63,6 @@ const ClaimSymptomsPage: React.FC = () => {
     // ✅ 로컬 스토리지에 저장 (새로고침 대비)
     localStorage.setItem("claimData", JSON.stringify(updatedClaimData));
 
-    console.log("🔍 ClaimSymptomsPage에서 저장되는 데이터:", updatedClaimData);
 
     // ✅ 다음 페이지(서명 입력)로 이동
     navigate("/main/claim/signature", { state: updatedClaimData });

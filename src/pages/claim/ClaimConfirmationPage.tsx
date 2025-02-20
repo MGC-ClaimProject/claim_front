@@ -93,7 +93,6 @@ const ClaimConfirmationPage: React.FC = () => {
       });
 
        if (response.status === 201) {
-        console.log("✅ 청구 생성 성공:", response.data);
 
         const newClaimId = response.data.id;
 
@@ -102,7 +101,6 @@ const ClaimConfirmationPage: React.FC = () => {
 
         // ✅ 로컬 스토리지에서 claimData 삭제
         localStorage.removeItem("claimData");
-        console.log("📂 claimData 삭제됨, 새로운 claimId 저장됨:", newClaimId);
 
         // ✅ navigate 실행 (이제 상태에서 claimId를 받아옴)
         navigate(`/main/claim/add-documents/`);

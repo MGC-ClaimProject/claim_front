@@ -27,7 +27,6 @@ const InsuranceDetailPage: React.FC = () => {
 
     const fetchInsuranceDetail = async () => {
       try {
-        console.log(`📡 보험 상세 정보 요청: insuranceId=${insuranceId}`);
         const response = await auth.get(`/insurances/${insuranceId}/insurance/`);
         setInsurance(response.data);
       } catch (error) {

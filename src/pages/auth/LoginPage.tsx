@@ -19,7 +19,6 @@ const LoginPage: React.FC = () => {
     const kakaoCode = searchParams.get("code");
 
     if (kakaoCode) {
-      console.log("✅ 인가 코드 수신:", kakaoCode);
       handleAuth(kakaoCode);
     }
   }, [searchParams]);
@@ -31,14 +30,11 @@ const LoginPage: React.FC = () => {
       // ✅ 로그인 전 요청 → `client` 사용
       const response = await client.post(KAKAO_REDIRECT_URI, { code });
 
-      console.log("✅ 백엔드 응답 상태 코드:", response.status);
 
       if (response.status === 201 && response.data.access_token) {
-        console.log("✅ 신규 회원 - 회원가입 페이지로 이동");
         setAuth(response.data.access_token, response.data.user);
         navigate("/signup");
       } else if (response.status === 200 && response.data.access_token) {
-        console.log("✅ 기존 회원 - 로그인 성공");
         setAuth(response.data.access_token, response.data.user);
         navigate("/main");
       }

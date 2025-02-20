@@ -39,8 +39,6 @@ const Signup: React.FC = () => {
           prev.id < curr.id ? prev : curr
         );
 
-        console.log(`✅ 첫 번째 멤버 ID: ${firstMember.id}`);
-
         // ✅ 가져온 생년월일이 오늘 날짜라면 빈 문자열로 변환
         const birthValue = firstMember.birth === today ? "" : firstMember.birth;
 
@@ -69,7 +67,6 @@ const Signup: React.FC = () => {
     // ✅ 최신 상태를 가져옴
     const latestFormData = { ...formData };
 
-    console.log("📋 최신 formData 값:", latestFormData);
 
     // ✅ 필수 입력값 검증
     if (!latestFormData.name || !latestFormData.phone || !latestFormData.birth || !latestFormData.gender) {
@@ -84,7 +81,6 @@ const Signup: React.FC = () => {
       relation: "Self",
     };
 
-    console.log("✅ 저장할 최신 데이터:", updatedSignupData);
 
     // ✅ 최신 데이터를 Zustand에도 반영
     setFormData(updatedSignupData);

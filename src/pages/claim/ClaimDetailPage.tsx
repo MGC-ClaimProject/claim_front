@@ -41,35 +41,34 @@ const ClaimDetailPage: React.FC = () => {
     }
   }, [claimId, navigate]);
 
+  const fetchClaimDetail = async () => {
+    try {
+      setLoading(true);
+      const response = await auth.get(`/claims/${claimId}/claim/`);
+      const data = response.data;
+
+      const formattedData: ClaimData = {
+        ...data,
+        claim_status: CLAIM_STATUS_CHOICES[data.claim_status] || "정보 없음",
+        incident_type: data.incident_type ?? "정보 없음",
+        treatment_type: data.treatment_type ?? "정보 없음",
+        incident_date: new Date(data.incident_date).toISOString().split("T")[0],
+        bank: BANK_CHOICES[data.bank] || "정보 없음",
+        claim_insurers: (data.claim_insurers ?? []).map((insurer: Insurer) => ({
+          company: INSURANCE_COMPANIES.general?.[insurer.company] || insurer.company,
+        })),
+      };
+
+      setClaimDetail(formattedData);
+    } catch (error) {
+      console.error("❌ 청구 상세 정보 가져오기 실패:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!claimId) return;
-
-    const fetchClaimDetail = async () => {
-      try {
-        const response = await auth.get(`/claims/${claimId}/claim/`);
-        const data = response.data;
-
-        const formattedData: ClaimData = {
-          ...data,
-          claim_status: CLAIM_STATUS_CHOICES[data.claim_status] || "정보 없음",
-          incident_type: data.incident_type ?? "정보 없음",
-          treatment_type: data.treatment_type ?? "정보 없음",
-          incident_date: new Date(data.incident_date).toISOString().split("T")[0],
-          bank: BANK_CHOICES[data.bank] || "정보 없음",
-          claim_insurers: (data.claim_insurers ?? []).map((insurer: Insurer) => ({
-            company: INSURANCE_COMPANIES.general?.[insurer.company] || insurer.company,
-          })),
-        };
-
-        setClaimDetail(formattedData);
-      } catch (error) {
-        console.error("❌ 청구 상세 정보 가져오기 실패:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchClaimDetail();
+    if (claimId) fetchClaimDetail();
   }, [claimId]);
 
   // ✅ 추가 문서 업로드 페이지로 이동 (claimId 전달)
@@ -77,16 +76,18 @@ const ClaimDetailPage: React.FC = () => {
     navigate("/main/claim/add-documents", { state: { claimId } });
   };
 
-  // ✅ 보험사 청구하기 요청
+  // ✅ 보험사 청구하기 요청 (성공 후 현재 페이지에서 최신 정보로 갱신)
   const handleSubmitClaim = async () => {
     if (!claimId) return;
 
     setIsSubmitting(true);
     try {
-      const response = await auth.post(`/claims/${claimId}/submit/`);
-      if (response.status === 201) {
+      const response = await auth.post(`/claims/${claimId}/send/`);
+      if (response.status === 200) {
         alert("✅ 보험사 청구가 완료되었습니다!");
-        navigate("/main/claim/success"); // ✅ 성공 페이지로 이동
+
+        // ✅ 최신 데이터 다시 불러오기 (새로운 정보로 로딩)
+        fetchClaimDetail();
       } else {
         throw new Error("보험사 청구 실패");
       }
@@ -161,7 +162,11 @@ const ClaimDetailPage: React.FC = () => {
         )}
       </div>
 
-      <button className="submit-btn" onClick={handleSubmitClaim} disabled={isSubmitting}>
+      <button
+        className="submit-btn"
+        onClick={handleSubmitClaim}
+        disabled={isSubmitting || claimDetail.claim_status === "발송완료"} // ✅ 발송 완료된 경우 비활성화
+      >
         {isSubmitting ? "보험사 청구 중..." : "보험사에 청구하기"}
       </button>
     </div>

@@ -5,7 +5,6 @@ import Signup from "./pages/auth/Signup.tsx";
 import AdConsentPage from "./pages/auth/AdConsentPage";
 import SignupCompletePage from "./pages/auth/SignupCompletePage.tsx";
 
-
 const AuthRoutes: React.FC = () => {
   return (
     <Routes>

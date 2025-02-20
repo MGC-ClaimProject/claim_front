@@ -11,7 +11,7 @@ interface Claim {
   insured_name: string;
   incident_type: string;
   incident_date: string;
-  status: string;
+  claim_status: string;
 }
 
 // ✅ 멤버별 청구 내역을 그룹화하는 함수

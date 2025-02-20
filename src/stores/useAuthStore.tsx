@@ -1,78 +1,9 @@
+// 📂 src/stores/useAuthStore.ts
 import { create } from "zustand";
 import { auth } from "../api/axiosInstance";
+import { AuthState, ClaimData, Member, Insurance } from "../types/authTypes";
 
-export interface Document {
-  id: number;
-  document_url: string;
-  created_at: string;
-  page_count?: number;
-}
-
-export interface ClaimData {
-  claimId?: number;
-  member?: Member;
-  insured?: Member;
-  applicant?: Member;
-  symptoms?: string;
-  incidentType?: string;
-  treatmentType?: string;
-  hospitalDays?: number | null;
-  incidentDate?: string;
-  applicantSignature?: string | null;
-  insuredSignature?: string | null;
-  bank?: string | null;
-  account?: string | null;
-  isSameAsPayoutAccount?: boolean;
-  claimStatus?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  claimInsurers?: { company: string; policy_name: string }[];
-  documents?: Document[];
-  selectedInsurances?: { company: string; policy_name: string }[]; // ✅ 추가
-}
-
-
-
-export interface User {
-  id: number;
-  email: string;
-  user_name: string;
-  phone: string;
-  birth: string;
-  member_id: number;
-}
-
-export interface Member {
-  id: number;
-  name: string;
-  phone: string;
-  birth: string;
-  gender: string;
-  relation: string;
-}
-
-export interface Insurance {
-  id: number;
-  company: string;
-  policy_name: string;
-  premium: number;
-}
-
-interface AuthState {
-  accessToken: string | null;
-  user: User | null;
-  member: Member | null;
-  members: Member[];
-  claimData: ClaimData | null;
-  selectedMemberId: number | null; // ✅ 추가
-  setSelectedMemberId: (id: number | null) => void; // ✅ 추가
-  setAuth: (accessToken: string, user: User) => void;
-  clearAuth: () => void;
-  fetchUser: () => Promise<void>;
-  fetchMembers: () => Promise<void>;
-  fetchMember: (id: number) => Promise<void>;
-  setClaimData: (data: ClaimData | null) => void;
-}
+export type { ClaimData, Member, Insurance};
 
 export const useAuthStore = create<AuthState>((set) => ({
   accessToken: localStorage.getItem("access_token"),
@@ -80,12 +11,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   member: JSON.parse(localStorage.getItem("member") || "null"),
   members: [],
   claimData: JSON.parse(localStorage.getItem("claimData") || "null"),
-  selectedMemberId: null, // ✅ 기본값 설정
+  selectedMemberId: null,
+  isAuthenticated: !!localStorage.getItem("access_token"), // ✅ 로그인 여부 추가
 
   setAuth: (accessToken, user) => {
     localStorage.setItem("access_token", accessToken);
     localStorage.setItem("user", JSON.stringify(user));
-    set({ accessToken, user });
+    set({ accessToken, user, isAuthenticated: true });
+
   },
 
   clearAuth: () => {
@@ -93,7 +26,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.removeItem("user");
     localStorage.removeItem("member");
     localStorage.removeItem("claimData");
-    set({ accessToken: null, user: null, member: null, claimData: null, members: [], selectedMemberId: null });
+    set({
+      accessToken: null,
+      user: null,
+      member: null,
+      claimData: null,
+      members: [],
+      selectedMemberId: null,
+      isAuthenticated: false,
+    });
+
   },
 
   fetchUser: async () => {
@@ -108,7 +50,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   fetchMembers: async () => {
     try {
-      console.log("📡 가족 멤버 가져오는 중...");
       const response = await auth.get("/members/");
       set({ members: response.data });
     } catch (error) {
@@ -125,7 +66,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  setSelectedMemberId: (id) => set({ selectedMemberId: id }), // ✅ 멤버 선택 함수 추가
+  setSelectedMemberId: (id) => set({ selectedMemberId: id }),
 
   setClaimData: (data: ClaimData | null) => {
     if (data === null) {
@@ -135,5 +76,44 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     set({ claimData: data });
   },
-}));
 
+  checkAuth: async () => {
+
+    try {
+      const token = localStorage.getItem("access_token");
+      const isAuthenticated = !!token;
+      set({ isAuthenticated }); // ✅ Zustand 상태 업데이트
+
+      return isAuthenticated;
+    } catch (error) {
+      console.error("❌ 로그인 상태 확인 실패:", error);
+      set({ isAuthenticated: false });
+      return false;
+    }
+  },
+
+  login: (token) => {
+    localStorage.setItem("access_token", token);
+    set({ isAuthenticated: true });
+  },
+
+  logout: async () => {
+    try {
+      const response = await auth.post("/users/logout/");
+      if (response.status === 200) {
+        alert("로그아웃 성공! 로그인 페이지로 이동합니다.");
+      } else {
+        alert("로그아웃 실패. 로그인 페이지로 이동합니다.");
+      }
+    } catch (error) {
+      console.error("❌ 로그아웃 오류:", error);
+      alert("로그아웃 중 오류 발생! 로그인 페이지로 이동합니다.");
+    } finally {
+      set((state) => {
+        state.clearAuth();
+        return { isAuthenticated: false };
+      });
+      window.location.href = "/login";
+    }
+  },
+}));

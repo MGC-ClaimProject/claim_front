@@ -16,7 +16,6 @@ const useClaimNavigation = () => {
       ...updatedData, // ✅ 새로운 데이터 덮어쓰기
     };
 
-    console.log("🚀 handleNext 실행 - 업데이트된 claimData:", newClaimData);
 
     // ✅ Zustand 상태 업데이트
     setClaimData(newClaimData);

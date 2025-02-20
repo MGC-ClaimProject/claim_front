@@ -13,7 +13,7 @@ const MemberClaimsButton: React.FC<ClaimButtonProps> = ({
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/main/${memberId}/claims`); // ✅ 해당 멤버의 청구 내역 페이지로 이동
+    navigate(`/main/claims`, { state: { memberId, memberName } }); // ✅ 상태로 memberId, memberName 전달
   };
 
   return (

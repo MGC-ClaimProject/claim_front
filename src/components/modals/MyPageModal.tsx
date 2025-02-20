@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { animated, useSpring } from "@react-spring/web";
 import { useAuthStore } from "../../stores/useAuthStore.tsx";
-import { handleLogout } from "../../utils/authHandlers.ts"; // ✅ 로그아웃 핸들러 가져오기
 
 interface MyPageModalProps {
   isOpen: boolean;
@@ -12,7 +11,7 @@ interface MyPageModalProps {
 const MyPageModal: React.FC<MyPageModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const logout = useAuthStore((state) => state.logout); // ✅ Zustand에서 logout() 가져오기
   const user = useAuthStore((state) => state.user);
 
   // ✅ `user_name`을 저장할 상태 변수
@@ -36,6 +35,11 @@ const MyPageModal: React.FC<MyPageModalProps> = ({ isOpen, onClose }) => {
     }
   }, [location.pathname]);
 
+  const handleLogout = () => {
+    logout(); // ✅ Zustand의 logout() 실행 (clearAuth 포함됨)
+    navigate("/login"); // ✅ 로그인 페이지로 이동
+  };
+
   return (
     <>
       <div className={`overlay ${isOpen ? "open" : ""}`} onClick={onClose}></div>
@@ -46,7 +50,7 @@ const MyPageModal: React.FC<MyPageModalProps> = ({ isOpen, onClose }) => {
           <li onClick={() => navigate("/main/profile")}>내 정보</li>
           <li onClick={() => navigate("/main/claims")}>청구 내역</li>
           <li onClick={() => navigate("/main/family")}>나의 가족</li>
-          <li onClick={() => handleLogout(clearAuth, navigate)}>로그아웃</li> {/* ✅ 핸들러 사용 */}
+          <li onClick={handleLogout}>로그아웃</li> {/* ✅ logout() 직접 호출 */}
         </ul>
       </animated.div>
     </>
