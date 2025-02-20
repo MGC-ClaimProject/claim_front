@@ -1,5 +1,6 @@
 /* ✅ 회원가입 컨테이너 */
 .signup-container {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,7 +8,7 @@
   min-height: 100vh;
   width: 100%;
   background: #f8f9fa;
-  padding-bottom: 30px;
+  padding: 1rem;
 }
 
 /* ✅ 회원가입 제목 */
@@ -22,6 +23,7 @@
 /* ✅ 프로필 & 동의 박스 크기 조정 */
 .signup-container .profile-card,
 .signup-container .agreement-box {
+  box-sizing: border-box;
   width: 100%; /* 기본적으로 화면 크기에 맞춤 */
   max-width: 380px; /* 최대 350px로 고정 */
   background: white;

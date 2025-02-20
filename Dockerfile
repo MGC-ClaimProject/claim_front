@@ -1,17 +1,18 @@
-# 🎯 1단계: React 빌드
-FROM node:18 AS builder
+# ✅ Node.js 18 버전 이미지 사용
+FROM node:18
 
+# ✅ 작업 디렉토리 설정
 WORKDIR /app
 
-COPY package.json package-lock.json /app/
+# ✅ package.json 및 package-lock.json 복사 후 의존성 설치
+COPY package.json package-lock.json ./
 RUN npm install
 
-COPY . /app/
-RUN npm run build
+# ✅ 프로젝트 코드 복사
+COPY . .
 
-# 🎯 2단계: Nginx를 사용하여 정적 파일 서빙
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
+# ✅ 포트 설정
+EXPOSE 5173
 
-CMD ["nginx", "-g", "daemon off;"]
+# ✅ React 개발 서버 실행
+CMD ["npm", "run", "dev"]
