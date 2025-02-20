@@ -44,7 +44,6 @@ const ClaimBankSelectionPage: React.FC = () => {
       isSameAsPayoutAccount: isSameAccount,
     };
 
-    console.log("🔍 ClaimBankSelectionPage에서 저장되는 데이터:", updatedClaimData);
 
     // ✅ 공통 `handleNext` 사용하여 상태 저장 및 페이지 이동
     handleNext(updatedClaimData, "/main/claim/confirmation");

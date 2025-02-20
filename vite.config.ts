@@ -1,12 +1,15 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
+// ✅ 빌드 시 정적 파일 경로를 `/src/static/frontend/`로 설정
 export default defineConfig({
   plugins: [react()],
-  server: {
-    hmr: {
-      overlay: false, // ✅ HMR 오류로 인해 페이지 이동이 막히는 문제 해결
+  base: "/src/static/frontend/", // ✅ index.html 내 정적 파일 경로 지정
+  build: {
+    outDir: "dist", // ✅ 빌드 디렉토리 유지
+    manifest: true, // ✅ 정적 파일 매핑을 위한 manifest.json 생성
+    rollupOptions: {
+      input: "/index.html", // ✅ index.html을 빌드 대상으로 설정
     },
   },
-})
+});

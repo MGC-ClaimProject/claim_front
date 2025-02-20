@@ -35,9 +35,7 @@ const SearchInsuranceMembers: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("📡 가족 멤버 조회 요청 보내는 중...");
       const response = await auth.get<Member[]>("/members/");
-      console.log("✅ 응답 받은 멤버 리스트:", response.data);
 
       // ✅ 각 멤버의 보험 개수를 가져오기 위해 개별 API 호출
       const membersWithInsurance = await Promise.all(
@@ -65,12 +63,9 @@ const SearchInsuranceMembers: React.FC = () => {
     setUpdatingMemberId(member.id);
     setError(null);
     try {
-      console.log(`🔄 ${member.name}님의 보험 정보 새로 조회 요청 중...`);
       await auth.post(`/insurances/update/${member.id}/`); // ✅ 경로 파라미터로 멤버 ID 포함
-      console.log(`✅ ${member.name}님의 보험 정보 갱신 완료`);
       await fetchMembersWithInsuranceCount(); // ✅ 멤버 + 보험 개수 다시 가져오기
     } catch (error) {
-      console.error(`❌ ${member.name}님의 보험 정보 갱신 실패:`, error);
       setError("보험 정보를 새로 불러오는 데 실패했습니다.");
     } finally {
       setUpdatingMemberId(null);

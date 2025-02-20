@@ -41,7 +41,6 @@ const InsuranceListPage: React.FC = () => {
 
     setLoading(true);
     try {
-      console.log(`📡 멤버 ${effectiveMemberId}의 보험 리스트 가져오는 중...`);
       const response = await auth.get(`/insurances/${effectiveMemberId}/`);
       setInsurances(response.data);
 
@@ -65,9 +64,7 @@ const InsuranceListPage: React.FC = () => {
     if (!effectiveMemberId) return;
     setIsUpdating(true);
     try {
-      console.log(`📡 멤버 ${effectiveMemberId}의 보험 데이터 갱신 요청`);
       await auth.post(`/insurances/update/${effectiveMemberId}/`);
-      console.log("✅ 보험 데이터 갱신 완료");
       fetchInsurances(); // ✅ 데이터 새로 불러오기
     } catch (error) {
       console.error("❌ 보험 데이터 갱신 실패:", error);

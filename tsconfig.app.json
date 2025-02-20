@@ -12,7 +12,8 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": false, // ✅ 수정: 타입 선언 파일 생성 허용
+    "emitDeclarationOnly": true, // ✅ 추가: 타입 선언만 생성
     "jsx": "react-jsx",
 
     /* Linting */
@@ -20,7 +21,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* 프로젝트 참조를 위한 필수 설정 */
+    "composite": true // ✅ 추가
   },
   "include": ["src"]
 }

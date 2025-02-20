@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAuthStore, Member, User } from "../../stores/useAuthStore"; // ✅ Zustand 상태 사용
+import { useAuthStore, Member } from "../../stores/useAuthStore"; // ✅ Zustand 상태 사용
 import useClaimNavigation from "../../hooks/useClaimNavigation"; // ✅ 페이지 이동 훅 사용
 import "../../styles/pages/claim/claimCreatePage.css";
 
@@ -9,8 +9,10 @@ const ClaimCreatePage: React.FC = () => {
   const [agree, setAgree] = useState(false);
   const [selectedInsured, setSelectedInsured] = useState<Member | null>(null);
 
-  // ✅ 신청자를 로그인한 유저로 자동 설정
-  const selectedApplicant: User | null = user || null;
+  // ✅ 신청자를 로그인한 유저 정보로 변환 (Member 타입 맞춤)
+  const selectedApplicant: Member | null = user
+    ? { id: user.id, name: user.user_name, phone: "", birth: "", gender: "", relation: "Self" }
+    : null;
 
   // ✅ 가족 멤버 데이터 가져오기
   useEffect(() => {
@@ -45,10 +47,7 @@ const ClaimCreatePage: React.FC = () => {
     // ✅ 상태 업데이트 및 페이지 이동
     handleNext(
       {
-        applicant: {
-          id: selectedApplicant.id,
-          name: selectedApplicant.user_name,
-        },
+        applicant: selectedApplicant, // ✅ applicant가 Member 타입으로 맞춰짐
         insured: selectedInsured,
       },
       "/main/select-insurance"
@@ -63,7 +62,7 @@ const ClaimCreatePage: React.FC = () => {
       <div className="claim-box">
         <div className="claim-applicant">
           <span>👤 신청자</span>
-          <span>{selectedApplicant?.user_name || "-"}</span>
+          <span>{selectedApplicant?.name || "-"}</span>
         </div>
       </div>
 

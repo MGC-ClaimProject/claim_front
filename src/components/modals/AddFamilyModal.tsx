@@ -48,16 +48,13 @@ const AddFamilyModal: React.FC<AddFamilyModalProps> = ({ onClose }) => {
         relation: formData.relation,
       };
 
-      console.log("📤 가족 추가 요청 데이터:", requestData); // ✅ 디버깅용
-
       const response = await auth.post("/members/", requestData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
 
-      console.log("✅ 가족 추가 성공:", response.data);
-      alert("가족이 추가되었습니다!");
+      alert(`${response.data.member.name}님이 가족 목록에 추가되었습니다!`);
 
       onClose(); // ✅ 모달 닫기
       window.location.reload(); // ✅ 페이지 새로고침 (가족 리스트 갱신)
@@ -66,6 +63,7 @@ const AddFamilyModal: React.FC<AddFamilyModalProps> = ({ onClose }) => {
       alert("가족 추가에 실패했습니다.");
     }
   };
+
 
   return (
     <div className="modal-overlay">
